@@ -1,0 +1,34 @@
+Jolibox Proprietary SDK License
+
+Copyright © 2024–2026 Jolibox Pte. Ltd. All rights reserved.
+
+This repository contains the Jolibox Flutter Ads bridge (the "Software").
+
+1. Grant of license
+Subject to this License and any applicable written agreement with Jolibox Pte. Ltd. ("Jolibox"), Jolibox grants you a limited, non-exclusive, non-transferable, non-sublicensable, revocable license to use and integrate the Software solely with a Jolibox-authorized application and the corresponding Jolibox services and SDK dependencies.
+
+2. Restrictions
+Except as expressly permitted in writing by Jolibox, you must not:
+(a) sell, rent, lease, sublicense, redistribute, publish, or otherwise make the Software or any Jolibox SDK binary available to a third party;
+(b) reverse engineer, decompile, disassemble, modify, or create derivative works of the Software or associated Jolibox SDK binaries, except to the extent such restriction is prohibited by applicable law;
+(c) remove, obscure, or alter proprietary notices;
+(d) bypass, interfere with, or attempt to circumvent access controls, service restrictions, advertising controls, or security measures; or
+(e) represent a modified version of the Software as an official Jolibox product.
+
+3. Ownership
+The Software, Jolibox services, SDK dependencies, trademarks, and all related intellectual-property rights remain the property of Jolibox or its licensors. This License does not transfer ownership or grant any trademark rights.
+
+4. Third-party materials
+The Software may depend on third-party software that is governed by its own license terms. You are responsible for complying with all applicable third-party terms.
+
+5. No warranty
+THE SOFTWARE IS PROVIDED "AS IS" AND "AS AVAILABLE", WITHOUT WARRANTIES OF ANY KIND, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, INCLUDING WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT, TO THE MAXIMUM EXTENT PERMITTED BY LAW.
+
+6. Limitation of liability
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, JOLIBOX AND ITS LICENSORS WILL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, EXEMPLARY, OR PUNITIVE DAMAGES, OR FOR ANY LOSS OF DATA, REVENUE, PROFITS, OR BUSINESS OPPORTUNITY, ARISING FROM OR RELATED TO THE SOFTWARE.
+
+7. Termination
+This License terminates automatically if you breach it. Jolibox may terminate this License or access to associated services as permitted by an applicable written agreement or law. Upon termination, you must stop using the Software and remove all copies under your control.
+
+8. Contact
+For licensing or support inquiries, contact contact@jolibox.com.

@@ -1,0 +1,21 @@
+name: jolibox_ads_flutter
+description: Flutter bridge for the Jolibox Host Ads SDK on Android and iOS.
+version: 0.1.0
+homepage: https://jolibox.com
+
+environment:
+  sdk: ^3.0.0
+  flutter: ">=3.3.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        package: com.jolibox.android.sdk.ads.flutter
+        pluginClass: JoliboxAdsFlutterPlugin
+      ios:
+        pluginClass: JoliboxAdsFlutterPlugin
