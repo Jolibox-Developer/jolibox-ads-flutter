@@ -4,7 +4,7 @@
 
 ## 范围
 
-本仓库发布公开 Flutter 桥接插件。Android 宿主提供批准的 Jolibox SDK-All 依赖并负责原生初始化。Flutter 插件不会打包或初始化 Jolibox、AdMob 或其他广告渠道。
+本仓库发布公开 Flutter 桥接插件。Android 宿主提供批准的 Jolibox SDK-All 依赖并负责原生初始化。Flutter 插件不初始化 Jolibox、AdMob 或其他广告渠道，也不拥有原生初始化流程。
 
 ## 发布检查清单
 
@@ -36,7 +36,8 @@ iOS 桥接代码存在，但 iOS **尚未验收，不可交付**。iOS SDK 制�
 
 - 从批准的 Git Tag 发布 Flutter 插件。
 - 明确记录 Flutter 插件 Tag 与 Android SDK-All 版本的匹配关系。
-- 不要发布私有仓库地址、凭证、内部配置接口或广告位 ID。
+- 下一次 Android 交付版本为 `v0.2.0`，对应 `jolibox-platform-sdk-all:1.9.0-rc.22399`。
+- 不要发布仓库凭证、内部配置接口或广告位 ID。
 - 每次公开发布都更新 `CHANGELOG.md` 和 `CHANGELOG.zh-CN.md`。
 
 ## 宿主依赖规则

@@ -2,6 +2,15 @@
 
 > **Chinese documentation:** [CHANGELOG.zh-CN.md](CHANGELOG.zh-CN.md)
 
+## 0.2.0
+
+- Requires Android SDK-All `1.9.0-rc.22399`.
+- Adds AdMob-shaped object APIs for interstitial and rewarded ads, plus callback entities for Banner and full-screen ads.
+- Keeps the previous static full-screen API for source compatibility.
+- Strengthens Android full-screen lifecycle handling for terminal and disposal events.
+- Android mixed-host QA validates native initialization and real Banner, interstitial, and rewarded test-ad display.
+- **iOS remains unaccepted for delivery.**
+
 ## 0.1.0
 
 - Adds a shared Flutter API for Banner, interstitial, and rewarded ads.

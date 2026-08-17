@@ -4,7 +4,7 @@
 
 ## Scope
 
-This repository distributes the public Flutter bridge. The Android Host supplies the approved Jolibox SDK-All dependency and owns native initialization. The Flutter package does not bundle or initialize Jolibox, AdMob, or another ad provider.
+This repository distributes the public Flutter bridge. The Android Host supplies the approved Jolibox SDK-All dependency and owns native initialization. The Flutter package does not initialize Jolibox, AdMob, or another ad provider, and does not own the native initialization flow.
 
 ## Release checklist
 
@@ -36,7 +36,8 @@ iOS can enter release validation only after Jolibox confirms artifact availabili
 
 - Publish the Flutter plugin from an approved Git tag.
 - Keep the plugin tag and Android SDK-All version explicitly documented together.
-- Do not publish private repository URLs, credentials, internal configuration endpoints, or ad unit IDs.
+- The next Android delivery is `v0.2.0` with `jolibox-platform-sdk-all:1.9.0-rc.22399`.
+- Do not publish repository credentials, internal configuration endpoints, or ad unit IDs.
 - Update `CHANGELOG.md` and `CHANGELOG.zh-CN.md` for every public release.
 
 ## Host dependency rule

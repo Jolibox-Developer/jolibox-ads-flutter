@@ -29,6 +29,7 @@ public final class JoliboxAdsFlutterPlugin implements FlutterPlugin, MethodChann
 
     private final Map<String, JoliboxInterstitialAd> interstitialAds = new HashMap<>();
     private final Map<String, JoliboxRewardedAd> rewardedAds = new HashMap<>();
+    private final Map<String, ShowingAd> showingAds = new HashMap<>();
     private Context applicationContext;
     private Activity activity;
     private MethodChannel channel;
@@ -71,22 +72,68 @@ public final class JoliboxAdsFlutterPlugin implements FlutterPlugin, MethodChann
 
     private void show(@NonNull String id, @NonNull MethodChannel.Result result) {
         if (activity == null) { result.error("ADS_ACTIVITY_REQUIRED", "A Flutter Activity is required to show an ad", null); return; }
+        if (!showingAds.isEmpty()) { result.error("ADS_SHOW_IN_PROGRESS", "A fullscreen ad is already presenting", null); return; }
         JoliboxInterstitialAd interstitialAd = interstitialAds.remove(id);
-        if (interstitialAd != null) { showInterstitial(id, interstitialAd, result); return; }
+        if (interstitialAd != null) {
+            ShowingAd showingAd = ShowingAd.interstitial(id, interstitialAd, result);
+            showingAds.put(id, showingAd);
+            showInterstitial(showingAd);
+            return;
+        }
         JoliboxRewardedAd rewardedAd = rewardedAds.remove(id);
-        if (rewardedAd != null) { showRewarded(id, rewardedAd, result); return; }
+        if (rewardedAd != null) {
+            ShowingAd showingAd = ShowingAd.rewarded(id, rewardedAd, result);
+            showingAds.put(id, showingAd);
+            showRewarded(showingAd);
+            return;
+        }
         result.error("ADS_AD_NOT_FOUND", "The loaded ad is missing, disposed, or already shown", null);
     }
 
-    private void showInterstitial(@NonNull String id, @NonNull JoliboxInterstitialAd ad, @NonNull MethodChannel.Result result) {
-        ad.setFullScreenContentCallback(new ResultCallback(id, result, false));
-        ad.show(activity);
+    private void showInterstitial(@NonNull ShowingAd showingAd) {
+        JoliboxInterstitialAd ad = showingAd.interstitialAd;
+        if (ad == null) return;
+        ad.setFullScreenContentCallback(new ResultCallback(showingAd, false));
+        try {
+            ad.show(activity);
+        } catch (RuntimeException error) {
+            failShowing(showingAd, showException(error));
+        }
     }
 
-    private void showRewarded(@NonNull String id, @NonNull JoliboxRewardedAd ad, @NonNull MethodChannel.Result result) {
-        ResultCallback callback = new ResultCallback(id, result, true);
+    private void showRewarded(@NonNull ShowingAd showingAd) {
+        JoliboxRewardedAd ad = showingAd.rewardedAd;
+        if (ad == null) return;
+        ResultCallback callback = new ResultCallback(showingAd, true);
         ad.setFullScreenContentCallback(callback);
-        ad.show(activity, callback::onRewarded);
+        try {
+            ad.show(activity, callback::onRewarded);
+        } catch (RuntimeException error) {
+            failShowing(showingAd, showException(error));
+        }
+    }
+
+    @NonNull private static AdsError showException(@NonNull RuntimeException error) {
+        String message = error.getMessage();
+        return new AdsError("ADS_SHOW_EXCEPTION", message == null ? error.getClass().getSimpleName() : message);
+    }
+
+    private void failShowing(@NonNull ShowingAd showingAd, @NonNull AdsError error) {
+        if (showingAd.terminal) return;
+        showingAd.terminal = true;
+        showingAds.remove(showingAd.adId);
+        showingAd.destroy();
+        if (channel != null) {
+            Map<String, Object> value = new HashMap<>();
+            value.put("adId", showingAd.adId);
+            value.put("code", error.getCode());
+            value.put("message", error.getMessage());
+            channel.invokeMethod("onAdFailedToShowFullScreenContent", value);
+        }
+        if (!showingAd.resultCompleted) {
+            showingAd.resultCompleted = true;
+            fail(showingAd.result, error);
+        }
     }
 
     private void disposeAd(@NonNull String id, @NonNull MethodChannel.Result result) {
@@ -94,6 +141,11 @@ public final class JoliboxAdsFlutterPlugin implements FlutterPlugin, MethodChann
         if (interstitialAd != null) { interstitialAd.destroy(); result.success(null); return; }
         JoliboxRewardedAd rewardedAd = rewardedAds.remove(id);
         if (rewardedAd != null) { rewardedAd.destroy(); result.success(null); return; }
+        ShowingAd showingAd = showingAds.get(id);
+        if (showingAd != null) {
+            result.success(null);
+            return;
+        }
         result.error("ADS_AD_NOT_FOUND", "The loaded ad is missing, disposed, or already shown", null);
     }
 
@@ -105,22 +157,64 @@ public final class JoliboxAdsFlutterPlugin implements FlutterPlugin, MethodChann
     @Override public void onReattachedToActivityForConfigChanges(@NonNull ActivityPluginBinding binding) { activity = binding.getActivity(); }
     @Override public void onDetachedFromActivity() { activity = null; }
 
-    private void disposeAll() { for (JoliboxInterstitialAd ad : interstitialAds.values()) ad.destroy(); for (JoliboxRewardedAd ad : rewardedAds.values()) ad.destroy(); interstitialAds.clear(); rewardedAds.clear(); }
+    private void disposeAll() {
+        for (JoliboxInterstitialAd ad : interstitialAds.values()) ad.destroy();
+        for (JoliboxRewardedAd ad : rewardedAds.values()) ad.destroy();
+        AdsError error = new AdsError("ADS_ENGINE_DETACHED", "The Flutter engine was detached while an ad was showing");
+        for (ShowingAd showingAd : new HashMap<>(showingAds).values()) failShowing(showingAd, error);
+        interstitialAds.clear();
+        rewardedAds.clear();
+        showingAds.clear();
+    }
 
     @NonNull static Map<String, Object> getArguments(Object arguments) { Map<String, Object> result = new HashMap<>(); if (!(arguments instanceof Map)) return result; for (Map.Entry<?, ?> entry : ((Map<?, ?>) arguments).entrySet()) if (entry.getKey() != null) result.put(String.valueOf(entry.getKey()), entry.getValue()); return result; }
     @NonNull static String getString(@NonNull Map<String, Object> arguments, @NonNull String key) { Object value = arguments.get(key); return value == null ? "" : String.valueOf(value); }
     @NonNull static JoliboxAdSize bannerSize(@NonNull Map<String, Object> arguments) { String size = getString(arguments, "size"); if ("largeBanner".equals(size)) return JoliboxAdSize.LARGE_BANNER; if ("mediumRectangle".equals(size)) return JoliboxAdSize.MEDIUM_RECTANGLE; return JoliboxAdSize.BANNER; }
 
     private final class ResultCallback extends JoliboxFullScreenContentCallback {
-        @NonNull private final String adId; @NonNull private final MethodChannel.Result result; private final boolean rewardable; private boolean clicked; private boolean rewarded;
-        ResultCallback(@NonNull String adId, @NonNull MethodChannel.Result result, boolean rewardable) { this.adId = adId; this.result = result; this.rewardable = rewardable; }
-        private void emit(@NonNull String event) { if (channel != null) { Map<String, Object> value = new HashMap<>(); value.put("adId", adId); channel.invokeMethod(event, value); } }
-        private void emitFailure(@NonNull AdsError error) { if (channel != null) { Map<String, Object> value = new HashMap<>(); value.put("adId", adId); value.put("code", error.getCode()); value.put("message", error.getMessage()); channel.invokeMethod("onAdFailedToShowFullScreenContent", value); } }
-        void onRewarded() { rewarded = true; emit("onUserEarnedReward"); }
-        @Override public void onAdShowedFullScreenContent() { emit("onAdShowedFullScreenContent"); }
-        @Override public void onAdImpression() { emit("onAdImpression"); }
-        @Override public void onAdClicked() { clicked = true; emit("onAdClicked"); }
-        @Override public void onAdDismissedFullScreenContent() { emit("onAdDismissedFullScreenContent"); Map<String, Object> value = new HashMap<>(); value.put("clicked", clicked); value.put("rewarded", rewardable && rewarded); result.success(value); }
-        @Override public void onAdFailedToShowFullScreenContent(@NonNull AdsError error) { emitFailure(error); fail(result, error); }
+        @NonNull private final ShowingAd showingAd; private final boolean rewardable; private boolean clicked; private boolean rewarded;
+        ResultCallback(@NonNull ShowingAd showingAd, boolean rewardable) { this.showingAd = showingAd; this.rewardable = rewardable; }
+        private void emit(@NonNull String event) { if (channel != null) { Map<String, Object> value = new HashMap<>(); value.put("adId", adId()); channel.invokeMethod(event, value); } }
+        private void emitFailure(@NonNull AdsError error) { if (channel != null) { Map<String, Object> value = new HashMap<>(); value.put("adId", adId()); value.put("code", error.getCode()); value.put("message", error.getMessage()); channel.invokeMethod("onAdFailedToShowFullScreenContent", value); } }
+        @NonNull private String adId() { return showingAd.adId; }
+        private boolean finishTerminal() {
+            if (showingAd.terminal) return false;
+            showingAd.terminal = true;
+            showingAds.remove(showingAd.adId);
+            showingAd.destroy();
+            return true;
+        }
+        void onRewarded() { if (showingAd.terminal || rewarded) return; rewarded = true; emit("onUserEarnedReward"); }
+        @Override public void onAdShowedFullScreenContent() { if (!showingAd.terminal) emit("onAdShowedFullScreenContent"); }
+        @Override public void onAdImpression() { if (!showingAd.terminal) emit("onAdImpression"); }
+        @Override public void onAdClicked() { if (!showingAd.terminal) { clicked = true; emit("onAdClicked"); } }
+        @Override public void onAdDismissedFullScreenContent() {
+            if (!finishTerminal()) return;
+            emit("onAdDismissedFullScreenContent");
+            Map<String, Object> value = new HashMap<>();
+            value.put("clicked", clicked);
+            value.put("rewarded", rewardable && rewarded);
+            if (!showingAd.resultCompleted) { showingAd.resultCompleted = true; showingAd.result.success(value); }
+        }
+        @Override public void onAdFailedToShowFullScreenContent(@NonNull AdsError error) {
+            if (!finishTerminal()) return;
+            emitFailure(error);
+            if (!showingAd.resultCompleted) { showingAd.resultCompleted = true; fail(showingAd.result, error); }
+        }
+    }
+
+    private static final class ShowingAd {
+        @NonNull final String adId;
+        @NonNull final MethodChannel.Result result;
+        JoliboxInterstitialAd interstitialAd;
+        JoliboxRewardedAd rewardedAd;
+        boolean terminal;
+        boolean resultCompleted;
+
+        private ShowingAd(@NonNull String adId, @NonNull MethodChannel.Result result) { this.adId = adId; this.result = result; }
+        @NonNull static ShowingAd interstitial(@NonNull String id, @NonNull JoliboxInterstitialAd ad, @NonNull MethodChannel.Result result) { ShowingAd value = new ShowingAd(id, result); value.interstitialAd = ad; return value; }
+        @NonNull static ShowingAd rewarded(@NonNull String id, @NonNull JoliboxRewardedAd ad, @NonNull MethodChannel.Result result) { ShowingAd value = new ShowingAd(id, result); value.rewardedAd = ad; return value; }
+        void releaseNativeReference() { interstitialAd = null; rewardedAd = null; }
+        void destroy() { if (interstitialAd != null) interstitialAd.destroy(); if (rewardedAd != null) rewardedAd.destroy(); releaseNativeReference(); }
     }
 }

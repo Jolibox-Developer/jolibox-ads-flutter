@@ -30,7 +30,7 @@ dependencies:
   jolibox_ads_flutter:
     git:
       url: https://github.com/Jolibox-Developer/jolibox-ads-flutter.git
-      ref: v0.1.0
+      ref: v0.2.0
 ```
 
 Then run:
@@ -43,9 +43,31 @@ Host applications should commit `pubspec.lock` when reproducible dependency reso
 
 ## Android prerequisites
 
-1. Add the approved, matching Jolibox Android SDK-All dependency to the Android Host.
+1. In the Android Host's `settings.gradle`, add the required Maven repositories to the existing `dependencyResolutionManagement.repositories` block. Keep `public` before `android-internal`, and do not create a second repositories block:
+
+```gradle
+dependencyResolutionManagement {
+  repositories {
+    google()
+    mavenCentral()
+    maven { url = uri('https://repo.jolibox.com/repository/public/') }
+    maven { url = uri('https://repo.jolibox.com/repository/android-internal/') }
+  }
+}
+```
+
+Then add the approved matching SDK-All dependency in the Android app module's `build.gradle`:
+
+```gradle
+dependencies {
+  implementation 'com.jolibox.android:jolibox-platform-sdk-all:1.9.0-rc.22399'
+}
+```
+
+If the Host already completed the native Android SDK integration in an earlier phase, keep that same approved SDK-All version and Maven configuration. Do not add a second Jolibox SDK graph or a different SDK-All version for Flutter.
+
 2. Configure the required AdMob Application ID in the Android Host manifest.
-3. Initialize Jolibox once in the native Android Host before opening the Flutter page.
+3. Complete the one-time `Jolibox.init(...)` and `JoliboxAds.initialize(...)` flow in the native Android Host, using the separately supplied Android SDK-All integration guide, before opening the Flutter page.
 4. Do not add a second Jolibox SDK graph or manually initialize AdMob beside SDK-All.
 
 The Flutter page may be embedded in an existing Android application. Flutter only calls the bridge; it does not own native initialization.
@@ -61,47 +83,80 @@ import 'package:jolibox_ads_flutter/jolibox_ads_flutter.dart';
 
 JoliboxBannerAd(
   scene: 'YOUR_BANNER_SCENE',
-  onLoaded: () {},
-  onFailedToLoad: (error) {},
-  onImpression: () {},
-  onClicked: () {},
-  onOpened: () {},
-  onClosed: () {},
+  callbacks: JoliboxBannerAdCallbacks(
+    onLoaded: () {},
+    onFailedToLoad: (error) {},
+    onImpression: () {},
+    onClicked: () {},
+    onOpened: () {},
+    onClosed: () {},
+  ),
 )
 ```
 
-Dispose the banner widget/controller according to the Flutter page lifecycle. Do not keep a disposed banner mounted or reuse a disposed native view.
+Dispose the banner widget according to the Flutter page lifecycle. Do not keep a disposed banner mounted or reuse a disposed native view.
 
 ### Interstitial and rewarded
 
-Load first, show after a successful load, and dispose an ad that will no longer be shown. A displayed ad object must not be reused. The current API exposes `show` and `disposeAd` as static methods on `JoliboxAdsFlutter`.
+Load first and show after a successful load. Dispose an ad that will no longer be shown. A displayed ad object must not be reused; the bridge automatically releases its native reference after dismissal or a show failure. Await every `show` call: a second fullscreen ad is rejected until the current one finishes.
 
 ```dart
-final interstitial = await JoliboxAdsFlutter.loadInterstitial(
-  'YOUR_INTERSTITIAL_SCENE',
+JoliboxInterstitialAd? interstitialAd;
+
+Future<void> loadInterstitial() => JoliboxInterstitialAd.load(
+  scene: 'YOUR_INTERSTITIAL_SCENE',
+  adLoadCallback: JoliboxInterstitialAdLoadCallback(
+    onAdLoaded: (ad) => interstitialAd = ad,
+    onAdFailedToLoad: (error) {},
+  ),
 );
-try {
-  await JoliboxAdsFlutter.show(interstitial);
-} finally {
-  await JoliboxAdsFlutter.disposeAd(interstitial);
+
+Future<void> showInterstitial() async {
+  final ad = interstitialAd;
+  if (ad == null) return;
+  interstitialAd = null;
+  ad.fullScreenContentCallback = JoliboxFullScreenContentCallback(
+    onAdImpression: () {},
+    onAdClicked: () {},
+    onAdDismissedFullScreenContent: () {},
+    onAdFailedToShowFullScreenContent: (error) {},
+  );
+  try {
+    await ad.show();
+  } finally {
+    await ad.dispose();
+  }
 }
 
-final rewarded = await JoliboxAdsFlutter.loadRewarded(
-  'YOUR_REWARDED_SCENE',
+JoliboxRewardedAd? rewardedAd;
+
+Future<void> loadRewarded() => JoliboxRewardedAd.load(
+  scene: 'YOUR_REWARDED_SCENE',
+  adLoadCallback: JoliboxRewardedAdLoadCallback(
+    onAdLoaded: (ad) => rewardedAd = ad,
+    onAdFailedToLoad: (error) {},
+  ),
 );
-try {
-  await JoliboxAdsFlutter.show(
-    rewarded,
-    callbacks: JoliboxFullscreenAdCallbacks(
-      onUserEarnedReward: () {},
-    ),
+
+Future<void> showRewarded() async {
+  final ad = rewardedAd;
+  if (ad == null) return;
+  rewardedAd = null;
+  ad.fullScreenContentCallback = JoliboxFullScreenContentCallback(
+    onAdDismissedFullScreenContent: () {},
+    onAdFailedToShowFullScreenContent: (error) {},
   );
-} finally {
-  await JoliboxAdsFlutter.disposeAd(rewarded);
+  try {
+    await ad.show(onUserEarnedReward: () {});
+  } finally {
+    await ad.dispose();
+  }
 }
 ```
 
-Use the callback API exposed by the plugin for lifecycle and result handling. Revenue events such as `onPaidEvent` are intentionally not exposed to the Host API.
+Call `showInterstitial()` or `showRewarded()` from an awaited Host business event, such as a button handler. Use the callback API exposed by the plugin for lifecycle and result handling. Revenue events such as `onPaidEvent` are intentionally not exposed to the Host API.
+
+The previous `JoliboxAdsFlutter.load...`, `show`, and `disposeAd` static APIs remain available for source compatibility. New integrations should use the object APIs above.
 
 ## Compatibility and verification
 
@@ -118,7 +173,7 @@ See [iOS Host Integration](docs/IOS-HOST-INTEGRATION.md) for the blocked future 
 
 ## Support
 
-Before integrating, confirm the approved plugin tag, Android SDK-All version, environment, and scene values with Jolibox. Do not publish private artifact URLs, credentials, internal configuration endpoints, or ad unit IDs in the Host application documentation.
+Before integrating, confirm the approved plugin tag, Android SDK-All version, environment, and scene values with Jolibox. Do not publish repository credentials, internal configuration endpoints, or ad unit IDs in the Host application documentation.
 
 ## Related documentation
 

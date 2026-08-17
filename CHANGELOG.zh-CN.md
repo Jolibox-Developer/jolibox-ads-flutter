@@ -2,6 +2,15 @@
 
 > **English documentation:** [CHANGELOG.md](CHANGELOG.md)
 
+## 0.2.0
+
+- 对应 Android SDK-All `1.9.0-rc.22399`。
+- 增加与 AdMob 调用形态一致的插屏、激励广告对象 API，以及 Banner、全屏广告回调实体。
+- 保留原有静态全屏广告 API，确保源码兼容。
+- 强化 Android 全屏广告终态和释放事件处理。
+- Android 混编 QA 已验证原生初始化，以及 Banner、插屏、激励测试广告真实展示。
+- **iOS 仍未验收，不可交付。**
+
 ## 0.1.0
 
 - 增加统一的 Banner、插屏和激励广告 Flutter API。
