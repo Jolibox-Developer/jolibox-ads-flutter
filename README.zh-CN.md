@@ -7,7 +7,7 @@
 ## 当前交付状态
 
 - **Android：** 当前已验证的交付目标。
-- **iOS：** 仓库中包含桥接代码，但尚未验收，不属于当前可交付能力。iOS SDK 制品仓库和私有 CocoaPods Specs 分发尚未就绪。Jolibox 确认制品可用并完成 iOS QA 前，宿主不要开始 iOS 接入、不要针对本插件执行 `pod install`，也不要在生产环境使用 iOS 桥接。
+- **iOS：** 通过公开的 iOS SDK `0.3.0` Release 和 Swift Package Manager 交付。CocoaPods 不是受支持的 iOS 交付方式；生产接入前仍需完成宿主运行时验收。
 
 ## 架构边界
 
@@ -30,7 +30,7 @@ dependencies:
   jolibox_ads_flutter:
     git:
       url: https://github.com/Jolibox-Developer/jolibox-ads-flutter.git
-      ref: v0.2.0
+      ref: v0.3.0
 ```
 
 然后执行：
@@ -43,18 +43,21 @@ flutter pub get
 
 ## Android 前置条件
 
-1. 在 Android 宿主的 `settings.gradle` 中，向已有的 `dependencyResolutionManagement.repositories` 加入所需 Maven 仓库；保持 `public` 在 `android-internal` 之前，不要新增第二个 repositories 块：
+1. 在 Android 宿主根目录的 `build.gradle` 中，向已有的 `allprojects.repositories` 加入所需 Maven 仓库。Flutter Android 工具会为 engine 制品声明项目级仓库，只在 `settings.gradle` 中配置可能被忽略；保持 `public` 在 `android-internal` 之前：
 
 ```gradle
-dependencyResolutionManagement {
+allprojects {
   repositories {
-    google()
-    mavenCentral()
+    // 保留宿主已有仓库。
     maven { url = uri('https://repo.jolibox.com/repository/public/') }
     maven { url = uri('https://repo.jolibox.com/repository/android-internal/') }
   }
 }
 ```
+
+如果使用 Kotlin DSL，请使用 `maven(url = "https://repo.jolibox.com/repository/public/")` 和对应的 `android-internal` URL。
+
+如果宿主强制使用 `RepositoriesMode.FAIL_ON_PROJECT_REPOS`，不要原样增加上述项目级 repositories：Flutter 也会为 engine 制品声明项目级仓库，宿主构建负责人需要在既有的 settings 级仓库策略中加入两个 Jolibox 仓库，并保留 Flutter engine 所需仓库。最终必须通过 `assembleDebug` 验证该策略。
 
 然后在 Android app 模块的 `build.gradle` 中加入批准且匹配的 SDK-All 依赖：
 
@@ -167,9 +170,15 @@ Future<void> showRewarded() async {
 
 ## iOS 接入状态
 
-仓库包含未来使用的 iOS 桥接代码，但 iOS 当前不是交付目标。在 iOS 制品仓库可用且 Jolibox 确认 iOS QA 通过前，不要将插件接入 iOS 宿主、配置私有 Specs 或执行 `pod install`。
+iOS 桥接要求 Flutter `3.44` 或更高版本；该版本默认启用 Swift Package Manager。如果之前曾关闭 SwiftPM，请在解析 Flutter App 前执行：
 
-详见[iOS 宿主接入（当前阻塞）](docs/IOS-HOST-INTEGRATION.zh-CN.md)。
+```bash
+flutter config --enable-swift-package-manager
+```
+
+iOS 宿主可无需 GitHub 仓库认证，直接解析公开的 `Jolibox-Developer/jolibox-ios-sdk` 仓库及其 Release asset。原生 iOS 宿主在展示 Flutter 页面前只初始化一次 Jolibox；Flutter 不得初始化 Jolibox 或 Google Mobile Ads。请勿使用 `pod install` 交付本桥接。
+
+SPM 的解析与构建链路已经验证；生产接入前仍需完成宿主运行时验收。
 
 ## 支持与信息边界
 
@@ -177,6 +186,5 @@ Future<void> showRewarded() async {
 
 ## 相关文档
 
-- [发布指南](docs/RELEASE.zh-CN.md)
-- [iOS 宿主接入（当前阻塞）](docs/IOS-HOST-INTEGRATION.zh-CN.md)
+- [iOS 宿主接入](docs/IOS-HOST-INTEGRATION.zh-CN.md)
 - [更新日志](CHANGELOG.zh-CN.md)

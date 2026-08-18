@@ -1,52 +1,43 @@
-# iOS 宿主接入（当前阻塞）
+# iOS 宿主接入
 
-> **English documentation:** [iOS Host Integration (Blocked)](IOS-HOST-INTEGRATION.md)
+> **English documentation:** [iOS Host Integration](IOS-HOST-INTEGRATION.md)
 
 ## 状态
 
-**尚未验收，不可交付。**
+iOS 桥接通过 Flutter Swift Package Manager 交付。已使用公开的 `JoliboxSDKAll` `0.3.0` 完成 Package 解析与 iOS Device 构建验证。
 
-仓库中包含 iOS 桥接实现，但 iOS SDK 制品仓库和私有 CocoaPods Specs 分发尚未就绪，iOS QA 也尚未完成。本文档只描述未来接入结构。
+生产上线前仍需完成宿主初始化和真实广告展示的运行时验收。本桥接不支持 CocoaPods。
 
-在 Jolibox 明确确认 iOS 解阻前，不要开始 iOS 宿主接入、针对本插件执行 `pod install`，也不要在生产环境使用 iOS 桥接。
+## 前置条件
 
-## 未来接入边界
+- iOS 15 及以上。
+- Flutter 3.44 或更高版本；默认已启用 Swift Package Manager。若之前关闭过 SwiftPM，请在解析 Flutter App 前执行：
 
-iOS 解阻后，原生 iOS 宿主将：
-
-- 在 App 进程内负责一次 Jolibox SDK 和广告渠道初始化；
-- 使用公司批准的 `JoliboxSDKAll` CocoaPods 依赖；
-- 使用宿主现有的 Flutter Add-to-App 架构嵌入 Flutter 模块；
-- 为每个自定义或缓存的 `FlutterEngine` 注册插件。
-
-Flutter 通过业务 `scene` 调用桥接，不初始化 SDK，也不访问渠道、广告位或内部配置。
-
-## 未来 Podfile 结构
-
-以下只是未来参考结构，当前不要执行：
-
-```ruby
-platform :ios, '15.0'
-
-flutter_application_path = File.expand_path('../flutter_ads_module', __dir__)
-podhelper = File.join(flutter_application_path, '.ios', 'Flutter', 'podhelper.rb')
-require podhelper
-
-target 'YourHost' do
-  use_frameworks!
-  install_all_flutter_pods(flutter_application_path)
-end
-
-post_install do |installer|
-  flutter_post_install(installer)
-end
+```bash
+flutter config --enable-swift-package-manager
 ```
 
-只有 iOS 解阻后，宿主才能配置批准的私有 Specs 源、执行 `flutter pub get`、执行 `pod install` 并打开生成的 workspace。
+- 使用批准的 Flutter 桥接 Tag：
 
-## 未来 Flutter Engine 注册
+```yaml
+dependencies:
+  jolibox_ads_flutter:
+    git:
+      url: https://github.com/Jolibox-Developer/jolibox-ads-flutter.git
+      ref: v0.3.0
+```
 
-如果使用自定义或缓存的 engine，宿主在展示 Flutter 页面前必须注册生成的 Flutter 插件：
+- 桥接会传递解析公开的 `JoliboxSDKAll` `0.3.0` Swift Package。Flutter App 不要额外添加 Jolibox SDK、Google Mobile Ads、UMP 或 `IGList*` 依赖。
+
+## 原生宿主边界
+
+原生 iOS 宿主在 App 进程内负责一次 Jolibox SDK 和广告渠道初始化。应用启动时初始化基础 SDK；基础 SDK 就绪后、展示 Flutter 内容前初始化广告。
+
+Flutter 仅通过业务 `scene` 调用桥接，不初始化 Jolibox、Google Mobile Ads、广告渠道或内部配置。
+
+## Flutter Engine 注册
+
+自定义或缓存 engine 必须在展示 Flutter 页面前注册生成的插件：
 
 ```swift
 let engine = FlutterEngine(name: "your-flutter-engine")
@@ -55,18 +46,13 @@ GeneratedPluginRegistrant.register(with: engine)
 openFlutterPage(engine: engine)
 ```
 
-具体 SDK 初始化 API 和配置值以批准的 iOS SDK 发布说明为准，不要从这个公开桥接仓库推断。
+## 依赖规则
 
-## 单一依赖规则
+- 只使用桥接通过 Swift Package Manager 解析出的依赖图。
+- 不要通过 `pod install` 交付本桥接；旧 CocoaPods 接入会明确报出配置错误。
+- 不要嵌入旧 SDK archive，也不要重复添加 Google Mobile Ads、UMP 或 `IGList*` framework。
+- 初始化始终由原生宿主负责，不要在 Flutter 侧增加初始化。
 
-iOS 交付批准后，宿主只能使用批准的 `JoliboxSDKAll` 依赖。不要与旧 SDK-All 压缩包、独立 Google Mobile Ads 或 UMP 依赖、独立 `IGList*` XCFramework，或其他重复依赖混用。
+## 生产验收
 
-## 解阻条件
-
-必须同时满足：
-
-- iOS SDK 制品仓库对目标构建环境可用；
-- 私有 CocoaPods Specs 源可以解析批准版本的 `JoliboxSDKAll`；
-- iOS 宿主完成依赖安装并成功构建；
-- 初始化、Banner、插屏、激励、生命周期、销毁和回调 QA 全部通过；
-- Jolibox 明确标记 iOS 已验收并可交付。
+生产上线前，需要在目标 iOS 环境验收宿主的一次初始化，以及 Banner、插屏、激励、生命周期、销毁和已支持回调的真实流程。

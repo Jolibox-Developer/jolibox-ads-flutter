@@ -1,52 +1,43 @@
-# iOS Host Integration (Blocked)
+# iOS Host Integration
 
 > **Chinese documentation:** [iOS Host Integration (Chinese)](IOS-HOST-INTEGRATION.zh-CN.md)
 
 ## Status
 
-**NOT ACCEPTED FOR DELIVERY.**
+The iOS bridge is delivered through Flutter Swift Package Manager support. Public package resolution and iOS Device builds are validated with `JoliboxSDKAll` `0.3.0`.
 
-The repository contains the iOS bridge implementation, but the iOS SDK artifact repository and private CocoaPods Specs distribution are not ready. iOS QA has not been completed. This document describes the intended future integration shape only.
+Complete Host runtime acceptance for initialization and ad display before a production rollout. CocoaPods is not supported for this bridge.
 
-Do not start iOS Host integration, run `pod install` for this plugin, or use the iOS bridge in production until Jolibox explicitly confirms that iOS is unblocked.
+## Prerequisites
 
-## Future integration boundary
+- iOS 15 or later.
+- Flutter 3.44 or later. Swift Package Manager support is enabled by default. If it was previously disabled, enable it before resolving the Flutter App:
 
-When iOS is unblocked, the native iOS Host will:
-
-- own Jolibox SDK and ad-provider initialization once per App process;
-- use the company-approved `JoliboxSDKAll` CocoaPods dependency;
-- embed the Flutter module using the Host's existing Flutter Add-to-App architecture;
-- register the plugin for every custom or cached `FlutterEngine`.
-
-Flutter will call the bridge with a business `scene`. It will not initialize the SDK or access provider, channel, ad unit, or internal configuration values.
-
-## Future Podfile shape
-
-This is a reference shape, not an instruction to run today:
-
-```ruby
-platform :ios, '15.0'
-
-flutter_application_path = File.expand_path('../flutter_ads_module', __dir__)
-podhelper = File.join(flutter_application_path, '.ios', 'Flutter', 'podhelper.rb')
-require podhelper
-
-target 'YourHost' do
-  use_frameworks!
-  install_all_flutter_pods(flutter_application_path)
-end
-
-post_install do |installer|
-  flutter_post_install(installer)
-end
+```bash
+flutter config --enable-swift-package-manager
 ```
 
-Only after iOS is unblocked may the Host configure the approved private Specs source, run `flutter pub get`, run `pod install`, and open the generated workspace.
+- Add the Flutter bridge at the approved tag:
 
-## Future Flutter Engine registration
+```yaml
+dependencies:
+  jolibox_ads_flutter:
+    git:
+      url: https://github.com/Jolibox-Developer/jolibox-ads-flutter.git
+      ref: v0.3.0
+```
 
-For a custom or cached engine, the Host must register generated Flutter plugins before presenting the Flutter page:
+- The public `JoliboxSDKAll` `0.3.0` Swift package is resolved transitively by the bridge. Do not add an additional Jolibox SDK, Google Mobile Ads, UMP, or `IGList*` package directly to the Flutter App.
+
+## Native Host Boundary
+
+The native iOS Host owns Jolibox SDK and ad-provider initialization once per App process. Initialize the base SDK during App startup, then initialize ads after the base SDK is ready and before showing Flutter content.
+
+Flutter calls the bridge with a business `scene`. It does not initialize Jolibox, Google Mobile Ads, an ad channel, or internal configuration.
+
+## Flutter Engine Registration
+
+For a custom or cached engine, register generated plugins before presenting the Flutter page:
 
 ```swift
 let engine = FlutterEngine(name: "your-flutter-engine")
@@ -55,18 +46,13 @@ GeneratedPluginRegistrant.register(with: engine)
 openFlutterPage(engine: engine)
 ```
 
-The exact initialization API and configuration values belong to the approved iOS SDK release instructions and must not be inferred from this public bridge repository.
+## Dependency Rules
 
-## Single-copy rule
+- Use only the Swift Package Manager dependency graph resolved by the bridge.
+- Do not run `pod install` to deliver this bridge. Legacy CocoaPods integration stops with a setup error.
+- Do not embed old SDK archives or duplicate Google Mobile Ads, UMP, or `IGList*` frameworks.
+- Keep native initialization in the Host; do not add Flutter-side initialization.
 
-After iOS delivery is approved, the Host should use only the approved `JoliboxSDKAll` dependency. Do not mix it with an old SDK-All archive, standalone Google Mobile Ads or UMP dependencies, standalone `IGList*` XCFrameworks, or equivalent duplicate package dependencies.
+## Production Acceptance
 
-## Unblocking criteria
-
-All of the following are required:
-
-- the iOS SDK artifact repository is available to the target build environment;
-- the private CocoaPods Specs source resolves the approved `JoliboxSDKAll` version;
-- the iOS Host installs dependencies and builds successfully;
-- initialization, Banner, interstitial, rewarded, lifecycle, disposal, and callback QA pass;
-- Jolibox explicitly marks iOS accepted for delivery.
+Before production rollout, verify the Host's one-time initialization and real Banner, interstitial, rewarded, lifecycle, disposal, and supported callback flows on the target iOS environment.

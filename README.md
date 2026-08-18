@@ -7,7 +7,7 @@
 ## Delivery status
 
 - **Android:** current validated delivery target.
-- **iOS:** bridge code exists, but iOS is not accepted for delivery yet. The iOS SDK artifact repository and private CocoaPods Specs distribution are not ready. Do not start iOS Host integration, run `pod install` for this plugin, or use the iOS bridge in production until Jolibox confirms artifact availability and iOS QA acceptance.
+- **iOS:** delivered through Swift Package Manager using the public `0.3.0` iOS SDK release. CocoaPods is not a supported iOS delivery path. Complete Host runtime acceptance before production rollout.
 
 ## Architecture
 
@@ -30,7 +30,7 @@ dependencies:
   jolibox_ads_flutter:
     git:
       url: https://github.com/Jolibox-Developer/jolibox-ads-flutter.git
-      ref: v0.2.0
+      ref: v0.3.0
 ```
 
 Then run:
@@ -43,18 +43,21 @@ Host applications should commit `pubspec.lock` when reproducible dependency reso
 
 ## Android prerequisites
 
-1. In the Android Host's `settings.gradle`, add the required Maven repositories to the existing `dependencyResolutionManagement.repositories` block. Keep `public` before `android-internal`, and do not create a second repositories block:
+1. In the Android Host root `build.gradle`, add the required Maven repositories to the existing `allprojects.repositories` block. Flutter's Android tooling declares project-level repositories for engine artifacts, so placing these repositories only in `settings.gradle` can be ignored. Keep `public` before `android-internal`:
 
 ```gradle
-dependencyResolutionManagement {
+allprojects {
   repositories {
-    google()
-    mavenCentral()
+    // Keep the Host's existing repositories.
     maven { url = uri('https://repo.jolibox.com/repository/public/') }
     maven { url = uri('https://repo.jolibox.com/repository/android-internal/') }
   }
 }
 ```
+
+For Kotlin DSL, use `maven(url = "https://repo.jolibox.com/repository/public/")` and the equivalent `android-internal` URL.
+
+If the Host enforces `RepositoriesMode.FAIL_ON_PROJECT_REPOS`, do not add this project-level block unchanged: Flutter also declares project repositories for its engine artifacts, so the Host build owner must add both Jolibox repositories and retain the required Flutter engine repository in the existing settings-level repository policy. Validate the final policy with `assembleDebug`.
 
 Then add the approved matching SDK-All dependency in the Android app module's `build.gradle`:
 
@@ -167,9 +170,15 @@ The previous `JoliboxAdsFlutter.load...`, `show`, and `disposeAd` static APIs re
 
 ## iOS integration status
 
-The repository contains iOS bridge code for future integration, but it is not a current delivery target. Do not add the plugin to an iOS Host, configure private Specs, or run `pod install` until the iOS artifact repository is available and Jolibox confirms iOS QA acceptance.
+The iOS bridge requires Flutter `3.44` or later. Swift Package Manager support is enabled by default in that release. If it was previously disabled, enable it before resolving the Flutter app:
 
-See [iOS Host Integration](docs/IOS-HOST-INTEGRATION.md) for the blocked future integration shape.
+```bash
+flutter config --enable-swift-package-manager
+```
+
+The iOS Host resolves the public `Jolibox-Developer/jolibox-ios-sdk` repository and its release assets without GitHub repository credentials. The native iOS Host initializes Jolibox once before rendering Flutter; Flutter must not initialize Jolibox or Google Mobile Ads. Do not use `pod install` to deliver this bridge.
+
+The SPM package-resolution and build path has been validated. Complete Host runtime acceptance before production rollout.
 
 ## Support
 
@@ -177,6 +186,5 @@ Before integrating, confirm the approved plugin tag, Android SDK-All version, en
 
 ## Related documentation
 
-- [Release Guide](docs/RELEASE.md)
-- [iOS Host Integration](docs/IOS-HOST-INTEGRATION.md) (blocked until iOS acceptance)
+- [iOS Host Integration](docs/IOS-HOST-INTEGRATION.md)
 - [Changelog](CHANGELOG.md)

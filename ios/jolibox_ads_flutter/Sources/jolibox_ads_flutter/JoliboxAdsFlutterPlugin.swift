@@ -1,5 +1,5 @@
 @preconcurrency import Flutter
-@preconcurrency import Jolibox
+@preconcurrency import JoliboxSDKAll
 import UIKit
 
 @MainActor
