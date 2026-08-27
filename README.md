@@ -70,7 +70,7 @@ dependencies {
 If the Host already completed the native Android SDK integration in an earlier phase, keep that same approved SDK-All version and Maven configuration. Do not add a second Jolibox SDK graph or a different SDK-All version for Flutter.
 
 2. Configure the required AdMob Application ID in the Android Host manifest.
-3. Complete the one-time `Jolibox.init(...)` and `JoliboxAds.initialize(...)` flow in the native Android Host, using the separately supplied Android SDK-All integration guide, before opening the Flutter page.
+3. Complete the one-time `Jolibox.init(...)` and `JoliboxAds.initialize(...)` flow in the native Android Host before opening the Flutter page. See [Native Host Initialization](docs/NATIVE-HOST-INITIALIZATION.md) for the required ownership, order, and configuration boundary.
 4. Do not add a second Jolibox SDK graph or manually initialize AdMob beside SDK-All.
 
 The Flutter page may be embedded in an existing Android application. Flutter only calls the bridge; it does not own native initialization.
@@ -235,4 +235,5 @@ Before integrating, confirm the approved plugin tag, Android SDK-All version, en
 ## Related documentation
 
 - [iOS Host Integration](docs/IOS-HOST-INTEGRATION.md)
+- [Native Host Initialization](docs/NATIVE-HOST-INITIALIZATION.md)
 - [Changelog](CHANGELOG.md)

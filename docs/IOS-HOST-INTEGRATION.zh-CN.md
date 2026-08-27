@@ -17,6 +17,13 @@ iOS 桥接通过 Flutter Swift Package Manager 交付，需要使用匹配发布
 flutter config --enable-swift-package-manager
 ```
 
+- 在 iOS app target 的 `Info.plist` 中增加 Jolibox 提供的 Google Mobile Ads 应用 ID：
+
+```xml
+<key>GADApplicationIdentifier</key>
+<string>由 Jolibox 提供的值</string>
+```
+
 - 使用批准的 Flutter 桥接 Tag：
 
 ```yaml
@@ -31,7 +38,7 @@ dependencies:
 
 ## 原生宿主边界
 
-原生 iOS 宿主在 App 进程内负责一次 Jolibox SDK 和广告渠道初始化。应用启动时初始化基础 SDK；基础 SDK 就绪后、展示 Flutter 内容前初始化广告。
+原生 iOS 宿主在 App 进程内负责一次 Jolibox SDK 和广告渠道初始化。应用启动时初始化基础 SDK；基础 SDK 就绪后、展示 Flutter 内容前初始化广告。初始化顺序与配置边界见[原生宿主初始化](NATIVE-HOST-INITIALIZATION.zh-CN.md)。
 
 Flutter 仅通过业务 `scene` 调用桥接，不初始化 Jolibox、Google Mobile Ads、广告渠道或内部配置。
 

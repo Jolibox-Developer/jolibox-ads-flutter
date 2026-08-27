@@ -17,6 +17,13 @@ Complete Host runtime acceptance for initialization and ad display before a prod
 flutter config --enable-swift-package-manager
 ```
 
+- Add the Google Mobile Ads application identifier supplied by Jolibox to the iOS app target's `Info.plist`:
+
+```xml
+<key>GADApplicationIdentifier</key>
+<string>value supplied by Jolibox</string>
+```
+
 - Add the Flutter bridge at the approved tag:
 
 ```yaml
@@ -31,7 +38,7 @@ dependencies:
 
 ## Native Host Boundary
 
-The native iOS Host owns Jolibox SDK and ad-provider initialization once per App process. Initialize the base SDK during App startup, then initialize ads after the base SDK is ready and before showing Flutter content.
+The native iOS Host owns Jolibox SDK and ad-provider initialization once per App process. Initialize the base SDK during App startup, then initialize ads after the base SDK is ready and before showing Flutter content. Follow [Native Host Initialization](NATIVE-HOST-INITIALIZATION.md) for the required order and configuration boundary.
 
 Flutter calls the bridge with a business `scene`. It does not initialize Jolibox, Google Mobile Ads, an ad channel, or internal configuration.
 

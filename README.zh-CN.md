@@ -70,7 +70,7 @@ dependencies {
 如果宿主已在第一期完成原生 Android SDK 接入，只需保留同一套已批准的 SDK-All 版本和 Maven 配置；不要为了 Flutter 再增加第二套 Jolibox SDK 依赖图或不同版本的 SDK-All。
 
 2. 在 Android 宿主 Manifest 中配置所需的 AdMob Application ID。
-3. 打开 Flutter 页面前，由 Android 原生宿主按单独提供的 Android SDK-All 接入文档完成一次 `Jolibox.init(...)` 和 `JoliboxAds.initialize(...)`。
+3. 打开 Flutter 页面前，由 Android 原生宿主完成一次 `Jolibox.init(...)` 和 `JoliboxAds.initialize(...)`。初始化的归属、顺序和配置边界见[原生宿主初始化](docs/NATIVE-HOST-INITIALIZATION.zh-CN.md)。
 4. 不要在 SDK-All 之外添加第二套 Jolibox 依赖，也不要重复初始化 AdMob。
 
 Flutter 页面可以嵌入已有 Android 应用；Flutter 只负责调用桥接，不负责原生初始化。
@@ -235,4 +235,5 @@ SPM 的解析与构建链路已经验证；生产接入前仍需完成宿主运�
 ## 相关文档
 
 - [iOS 宿主接入](docs/IOS-HOST-INTEGRATION.zh-CN.md)
+- [原生宿主初始化](docs/NATIVE-HOST-INITIALIZATION.zh-CN.md)
 - [更新日志](CHANGELOG.zh-CN.md)
