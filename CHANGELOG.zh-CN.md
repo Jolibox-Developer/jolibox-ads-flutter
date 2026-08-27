@@ -2,6 +2,13 @@
 
 > **English documentation:** [CHANGELOG.md](CHANGELOG.md)
 
+## 0.4.0
+
+- 在现有 `JoliboxBannerAd` Widget 中增加固定、Large Anchored Adaptive 和 Inline Adaptive Banner 尺寸能力。
+- 自适应请求必须由宿主传入 Banner 容器的实际宽度；原生广告加载成功前 Widget 不预留最终 Banner 高度。
+- Android 桥接升级为依赖 SDK-All `1.9.0-rc.23239`，iOS 桥接使用匹配的 iOS SDK `0.4.0` Release。
+- `JoliboxBannerSize` 从 Dart `enum` 调整为 class；常用固定尺寸常量保持兼容，但依赖 `values`、`index` 或穷尽 `switch` 的 enum 用法需要迁移。
+
 ## 0.3.0
 
 - 通过 Flutter Swift Package Manager 和公开的 `JoliboxSDKAll` `0.3.0` Package 交付 iOS 桥接。

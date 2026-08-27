@@ -31,6 +31,8 @@ final class JoliboxAdsBannerPlatformView: NSObject, @preconcurrency FlutterPlatf
     private let channel: FlutterMethodChannel
     private let scene: String
     private let sizeName: String
+    private let width: CGFloat?
+    private let maxHeight: CGFloat?
     private let presenter: () -> UIViewController?
     private let banner = JoliboxBannerAd()
     private var started = false
@@ -41,6 +43,8 @@ final class JoliboxAdsBannerPlatformView: NSObject, @preconcurrency FlutterPlatf
         channel = FlutterMethodChannel(name: "jolibox_ads_flutter/banner/\(viewID)", binaryMessenger: messenger)
         scene = (arguments["scene"] as? String ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
         sizeName = arguments["size"] as? String ?? "banner"
+        width = Self.number(arguments["width"])
+        maxHeight = Self.number(arguments["maxHeight"])
         self.presenter = presenter
         super.init()
         banner.delegate = self
@@ -71,7 +75,7 @@ final class JoliboxAdsBannerPlatformView: NSObject, @preconcurrency FlutterPlatf
         Task { @MainActor [weak self] in
             guard let self else { return }
             do {
-                try await self.banner.load(scene: self.scene, size: self.bannerSize(), rootViewController: controller)
+                try await self.banner.load(scene: self.scene, size: try self.bannerSize(), rootViewController: controller)
                 result(nil)
             } catch {
                 self.started = false
@@ -91,7 +95,11 @@ final class JoliboxAdsBannerPlatformView: NSObject, @preconcurrency FlutterPlatf
             bannerView.topAnchor.constraint(equalTo: container.topAnchor),
             bannerView.bottomAnchor.constraint(equalTo: container.bottomAnchor)
         ])
-        channel.invokeMethod("onLoaded", arguments: nil)
+        let resolvedSize = banner.resolvedSize ?? bannerView.intrinsicContentSize
+        channel.invokeMethod("onLoaded", arguments: [
+            "width": resolvedSize.width,
+            "height": resolvedSize.height
+        ])
     }
 
     func joliboxAdDidFail(scene: String, format: JoliboxAdsFormat, error: Error) { channel.invokeMethod("onFailedToLoad", arguments: errorValues(error)) }
@@ -101,14 +109,23 @@ final class JoliboxAdsBannerPlatformView: NSObject, @preconcurrency FlutterPlatf
     func joliboxAdDidDismiss(scene: String, format: JoliboxAdsFormat) { channel.invokeMethod("onClosed", arguments: nil) }
     func joliboxAdDidEarnReward(scene: String, format: JoliboxAdsFormat, amount: Int, type: String) {}
 
-    private func bannerSize() -> JoliboxBannerSize {
+    private func bannerSize() throws -> JoliboxBannerSize {
         switch sizeName {
         case "largeBanner": return .fixed(width: 320, height: 100)
         case "mediumRectangle": return .fixed(width: 300, height: 250)
-        default: return .fixed(width: 320, height: 50)
+        case "largeAnchoredAdaptive":
+            guard let width else { throw JoliboxAdsError(.invalidAdSize, "Adaptive Banner width is required") }
+            return .anchoredAdaptive(width: width)
+        case "inlineAdaptive":
+            guard let width else { throw JoliboxAdsError(.invalidAdSize, "Adaptive Banner width is required") }
+            if let maxHeight { return .inlineAdaptive(width: width, maxHeight: maxHeight) }
+            return .inlineAdaptive(width: width)
+        case "banner": return .fixed(width: 320, height: 50)
+        default: throw JoliboxAdsError(.invalidAdSize, "Unsupported Banner size: \(sizeName)")
         }
     }
 
+    private static func number(_ value: Any?) -> CGFloat? { (value as? NSNumber).map { CGFloat(truncating: $0) } }
     private func errorValues(_ error: Error) -> [String: Any] { ["code": errorCode(error), "message": error.localizedDescription] }
     private func errorCode(_ error: Error) -> String { (error as? JoliboxAdsError)?.code.rawValue ?? "ADS_LOAD_FAILED" }
 }

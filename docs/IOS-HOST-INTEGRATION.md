@@ -4,7 +4,7 @@
 
 ## Status
 
-The iOS bridge is delivered through Flutter Swift Package Manager support. Public package resolution and iOS Device builds are validated with `JoliboxSDKAll` `0.3.0`.
+The iOS bridge is delivered through Flutter Swift Package Manager support. It requires the matching published `JoliboxSDKAll` `0.4.0` release.
 
 Complete Host runtime acceptance for initialization and ad display before a production rollout. CocoaPods is not supported for this bridge.
 
@@ -24,10 +24,10 @@ dependencies:
   jolibox_ads_flutter:
     git:
       url: https://github.com/Jolibox-Developer/jolibox-ads-flutter.git
-      ref: v0.3.0
+      ref: v0.4.0
 ```
 
-- The public `JoliboxSDKAll` `0.3.0` Swift package is resolved transitively by the bridge. Do not add an additional Jolibox SDK, Google Mobile Ads, UMP, or `IGList*` package directly to the Flutter App.
+- The public `JoliboxSDKAll` `0.4.0` Swift package is resolved transitively by the bridge. Do not add an additional Jolibox SDK, Google Mobile Ads, UMP, or `IGList*` package directly to the Flutter App.
 
 ## Native Host Boundary
 

@@ -7,7 +7,7 @@
 ## Delivery status
 
 - **Android:** current validated delivery target.
-- **iOS:** delivered through Swift Package Manager using the public `0.3.0` iOS SDK release. CocoaPods is not a supported iOS delivery path. Complete Host runtime acceptance before production rollout.
+- **iOS:** delivered through Swift Package Manager using the matching public iOS SDK release. CocoaPods is not a supported iOS delivery path. Complete Host runtime acceptance before production rollout.
 
 ## Architecture
 
@@ -30,7 +30,7 @@ dependencies:
   jolibox_ads_flutter:
     git:
       url: https://github.com/Jolibox-Developer/jolibox-ads-flutter.git
-      ref: v0.3.0
+      ref: v0.4.0
 ```
 
 Then run:
@@ -63,7 +63,7 @@ Then add the approved matching SDK-All dependency in the Android app module's `b
 
 ```gradle
 dependencies {
-  implementation 'com.jolibox.android:jolibox-platform-sdk-all:1.9.0-rc.22399'
+  implementation 'com.jolibox.android:jolibox-platform-sdk-all:1.9.0-rc.23239'
 }
 ```
 
@@ -75,9 +75,31 @@ If the Host already completed the native Android SDK integration in an earlier p
 
 The Flutter page may be embedded in an existing Android application. Flutter only calls the bridge; it does not own native initialization.
 
+### Custom or cached FlutterEngine
+
+The standard `FlutterActivity` flow needs no extra Jolibox plugin-registration code. If the Host creates or caches its own `FlutterEngine`, follow Flutter's normal add-to-app lifecycle: execute the Dart entrypoint before caching the engine, then attach it with `FlutterActivity.withCachedEngine(...)`. Keep the default Activity attachment enabled because fullscreen ads require the foreground Activity.
+
+```kotlin
+val flutterEngine = FlutterEngine(applicationContext)
+flutterEngine.dartExecutor.executeDartEntrypoint(
+  DartExecutor.DartEntrypoint.createDefault(),
+)
+FlutterEngineCache.getInstance().put("host_ads_engine", flutterEngine)
+
+startActivity(
+  FlutterActivity.withCachedEngine("host_ads_engine").build(this),
+)
+```
+
+Use the Host project's normal generated Flutter plugin-registration setup. Do not manually construct `JoliboxAdsFlutterPlugin`, and do not initialize Jolibox or AdMob from Dart.
+
 ## Flutter API
 
 The business `scene` is agreed between the Host business and Jolibox. It is a routing key, not an ad unit ID. Provider, channel, and ad unit selection remain internal to the native SDK.
+
+### 0.4.0 source compatibility
+
+`JoliboxBannerSize` is now a class so adaptive constructors can accept width and optional maximum height. The common fixed-size calls remain unchanged: `JoliboxBannerSize.banner`, `JoliboxBannerSize.largeBanner`, and `JoliboxBannerSize.mediumRectangle`. Code that relied on the old Dart `enum` members (`values`, `index`, or exhaustive `switch` behavior) must be migrated and recompiled for `0.4.0`.
 
 ### Banner
 
@@ -98,6 +120,32 @@ JoliboxBannerAd(
 ```
 
 Dispose the banner widget according to the Flutter page lifecycle. Do not keep a disposed banner mounted or reuse a disposed native view.
+
+### Adaptive Banner
+
+Use the actual width available to the Banner's parent layout. The plugin does not infer screen width. `LayoutBuilder` is the recommended Flutter pattern:
+
+```dart
+LayoutBuilder(
+  builder: (context, constraints) => JoliboxBannerAd(
+    scene: 'YOUR_BANNER_SCENE',
+    size: JoliboxBannerSize.largeAnchoredAdaptive(
+      width: constraints.maxWidth,
+    ),
+  ),
+)
+```
+
+Use `largeAnchoredAdaptive` for a Banner anchored at the top or bottom of a page. Use `inlineAdaptive` for a Banner inserted in scrolling content; `maxHeight` is optional and, when supplied, must be at least `32` logical pixels:
+
+```dart
+JoliboxBannerAd(
+  scene: 'YOUR_INLINE_BANNER_SCENE',
+  size: JoliboxBannerSize.inlineAdaptive(width: bannerWidth, maxHeight: 100),
+)
+```
+
+Adaptive Banner widgets do not reserve their final Banner height before an ad loads or after a load failure. A one-logical-pixel internal bootstrap layout allows the native PlatformView to start loading; it is replaced with the actual size resolved by Google Mobile Ads on success. Changing the scene, size mode, width, or `maxHeight` disposes the old native Banner and requests a new one.
 
 ### Interstitial and rewarded
 

@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 
 import com.jolibox.android.sdk.ads.AdsError;
 import com.jolibox.android.sdk.ads.JoliboxAdSize;
+import com.jolibox.android.sdk.ads.JoliboxBannerSize;
 import com.jolibox.android.sdk.ads.JoliboxFullScreenContentCallback;
 import com.jolibox.android.sdk.ads.JoliboxInterstitialAd;
 import com.jolibox.android.sdk.ads.JoliboxRewardedAd;
@@ -169,7 +170,19 @@ public final class JoliboxAdsFlutterPlugin implements FlutterPlugin, MethodChann
 
     @NonNull static Map<String, Object> getArguments(Object arguments) { Map<String, Object> result = new HashMap<>(); if (!(arguments instanceof Map)) return result; for (Map.Entry<?, ?> entry : ((Map<?, ?>) arguments).entrySet()) if (entry.getKey() != null) result.put(String.valueOf(entry.getKey()), entry.getValue()); return result; }
     @NonNull static String getString(@NonNull Map<String, Object> arguments, @NonNull String key) { Object value = arguments.get(key); return value == null ? "" : String.valueOf(value); }
-    @NonNull static JoliboxAdSize bannerSize(@NonNull Map<String, Object> arguments) { String size = getString(arguments, "size"); if ("largeBanner".equals(size)) return JoliboxAdSize.LARGE_BANNER; if ("mediumRectangle".equals(size)) return JoliboxAdSize.MEDIUM_RECTANGLE; return JoliboxAdSize.BANNER; }
+    @NonNull static JoliboxAdSize fixedBannerSize(@NonNull String size) { if ("largeBanner".equals(size)) return JoliboxAdSize.LARGE_BANNER; if ("mediumRectangle".equals(size)) return JoliboxAdSize.MEDIUM_RECTANGLE; return JoliboxAdSize.BANNER; }
+
+    @NonNull static JoliboxBannerSize adaptiveBannerSize(@NonNull String size, double width, Double maxHeight) {
+        if (!Double.isFinite(width) || width <= 0) throw new IllegalArgumentException("Banner width must be finite and greater than zero");
+        int widthDp = (int) Math.round(width);
+        if ("largeAnchoredAdaptive".equals(size)) return JoliboxBannerSize.largeAnchoredAdaptive(widthDp);
+        if ("inlineAdaptive".equals(size)) {
+            if (maxHeight == null) return JoliboxBannerSize.inlineAdaptive(widthDp);
+            if (!Double.isFinite(maxHeight) || maxHeight < 32) throw new IllegalArgumentException("Inline adaptive Banner maxHeight must be finite and at least 32dp");
+            return JoliboxBannerSize.inlineAdaptive(widthDp, (int) Math.round(maxHeight));
+        }
+        throw new IllegalArgumentException("Unsupported adaptive Banner size: " + size);
+    }
 
     private final class ResultCallback extends JoliboxFullScreenContentCallback {
         @NonNull private final ShowingAd showingAd; private final boolean rewardable; private boolean clicked; private boolean rewarded;

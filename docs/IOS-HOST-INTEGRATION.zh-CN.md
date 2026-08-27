@@ -4,7 +4,7 @@
 
 ## 状态
 
-iOS 桥接通过 Flutter Swift Package Manager 交付。已使用公开的 `JoliboxSDKAll` `0.3.0` 完成 Package 解析与 iOS Device 构建验证。
+iOS 桥接通过 Flutter Swift Package Manager 交付，需要使用匹配发布的 `JoliboxSDKAll` `0.4.0`。
 
 生产上线前仍需完成宿主初始化和真实广告展示的运行时验收。本桥接不支持 CocoaPods。
 
@@ -24,10 +24,10 @@ dependencies:
   jolibox_ads_flutter:
     git:
       url: https://github.com/Jolibox-Developer/jolibox-ads-flutter.git
-      ref: v0.3.0
+      ref: v0.4.0
 ```
 
-- 桥接会传递解析公开的 `JoliboxSDKAll` `0.3.0` Swift Package。Flutter App 不要额外添加 Jolibox SDK、Google Mobile Ads、UMP 或 `IGList*` 依赖。
+- 桥接会传递解析公开的 `JoliboxSDKAll` `0.4.0` Swift Package。Flutter App 不要额外添加 Jolibox SDK、Google Mobile Ads、UMP 或 `IGList*` 依赖。
 
 ## 原生宿主边界
 

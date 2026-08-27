@@ -1,5 +1,5 @@
 group 'com.jolibox.android.sdk.ads.flutter'
-version '0.3.0'
+version '0.4.0'
 
 buildscript {
     repositories {
@@ -13,11 +13,18 @@ buildscript {
 
 apply plugin: 'com.android.library'
 
-def joliboxAdsVersion = project.findProperty('joliboxAdsVersion') ?: '1.9.0-rc.22399'
+repositories {
+    google()
+    mavenCentral()
+    maven { url 'https://repo.jolibox.com/repository/public/' }
+    maven { url 'https://repo.jolibox.com/repository/android-internal/' }
+}
+
+def joliboxAdsVersion = project.findProperty('joliboxAdsVersion') ?: '1.9.0-rc.23239'
 
 android {
     namespace 'com.jolibox.android.sdk.ads.flutter'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         minSdk 23

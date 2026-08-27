@@ -9,7 +9,7 @@ let package = Package(
     ],
     dependencies: [
         .package(name: "FlutterFramework", path: "../FlutterFramework"),
-        .package(url: "https://github.com/Jolibox-Developer/jolibox-ios-sdk.git", exact: "0.3.0")
+        .package(url: "https://github.com/Jolibox-Developer/jolibox-ios-sdk.git", exact: "0.4.0")
     ],
     targets: [
         .target(

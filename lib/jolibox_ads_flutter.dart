@@ -340,8 +340,9 @@ abstract class _JoliboxObjectAd {
           code: arguments?['code'] as String? ?? 'ADS_SHOW_FAILED',
           message: arguments?['message'] as String?,
         );
-        _fullScreenContentCallback?.onAdFailedToShowFullScreenContent
-            ?.call(error);
+        _fullScreenContentCallback?.onAdFailedToShowFullScreenContent?.call(
+          error,
+        );
         unawaited(_releaseAfterTerminal());
         break;
     }
@@ -360,8 +361,7 @@ class JoliboxInterstitialAd extends _JoliboxObjectAd {
   static Future<void> load({
     required String scene,
     required JoliboxInterstitialAdLoadCallback adLoadCallback,
-  }) =>
-      JoliboxAdsFlutter._loadInterstitialObject(scene, adLoadCallback);
+  }) => JoliboxAdsFlutter._loadInterstitialObject(scene, adLoadCallback);
 
   Future<void> show() => _show();
 }
@@ -372,8 +372,7 @@ class JoliboxRewardedAd extends _JoliboxObjectAd {
   static Future<void> load({
     required String scene,
     required JoliboxRewardedAdLoadCallback adLoadCallback,
-  }) =>
-      JoliboxAdsFlutter._loadRewardedObject(scene, adLoadCallback);
+  }) => JoliboxAdsFlutter._loadRewardedObject(scene, adLoadCallback);
 
   Future<void> show({VoidCallback? onUserEarnedReward}) =>
       _show(onUserEarnedReward: onUserEarnedReward);
@@ -441,15 +440,15 @@ class JoliboxBannerAd extends StatefulWidget {
     this.onOpened,
     this.onClosed,
   }) : assert(
-          callbacks == null ||
-              (onLoaded == null &&
-                  onFailedToLoad == null &&
-                  onImpression == null &&
-                  onClicked == null &&
-                  onOpened == null &&
-                  onClosed == null),
-          'Use either callbacks or the legacy Banner callbacks, not both.',
-        );
+         callbacks == null ||
+             (onLoaded == null &&
+                 onFailedToLoad == null &&
+                 onImpression == null &&
+                 onClicked == null &&
+                 onOpened == null &&
+                 onClosed == null),
+         'Use either callbacks or the legacy Banner callbacks, not both.',
+       );
   final String scene;
   final JoliboxBannerSize size;
   final JoliboxBannerAdCallbacks? callbacks;
@@ -467,6 +466,7 @@ class JoliboxBannerAd extends StatefulWidget {
 class _JoliboxBannerAdState extends State<JoliboxBannerAd> {
   MethodChannel? _eventChannel;
   int _viewGeneration = 0;
+  double? _resolvedAdaptiveHeight;
 
   @override
   void didUpdateWidget(covariant JoliboxBannerAd oldWidget) {
@@ -475,6 +475,7 @@ class _JoliboxBannerAdState extends State<JoliboxBannerAd> {
       _viewGeneration++;
       _eventChannel?.setMethodCallHandler(null);
       _eventChannel = null;
+      _resolvedAdaptiveHeight = null;
     }
   }
 
@@ -490,16 +491,16 @@ class _JoliboxBannerAdState extends State<JoliboxBannerAd> {
     JoliboxAdsFlutter._ensureSupportedPlatform();
     final creationParams = {
       'scene': JoliboxAdsFlutter._requireScene(widget.scene),
-      'size': widget.size.name,
+      ...widget.size.creationParams,
     };
     final viewType = 'jolibox_ads_flutter/banner';
     final viewGeneration = _viewGeneration;
     return SizedBox(
-      height: widget.size.height,
-      width: double.infinity,
+      height: widget.size.fixedHeight ?? _resolvedAdaptiveHeight ?? 1,
+      width: widget.size.width ?? double.infinity,
       child: Platform.isAndroid
           ? AndroidView(
-              key: ValueKey('${widget.scene}:${widget.size.name}'),
+              key: ValueKey('${widget.scene}:${widget.size.identity}'),
               viewType: viewType,
               creationParams: creationParams,
               creationParamsCodec: const StandardMessageCodec(),
@@ -507,7 +508,7 @@ class _JoliboxBannerAdState extends State<JoliboxBannerAd> {
                   _onPlatformViewCreated(id, viewGeneration),
             )
           : UiKitView(
-              key: ValueKey('${widget.scene}:${widget.size.name}'),
+              key: ValueKey('${widget.scene}:${widget.size.identity}'),
               viewType: viewType,
               creationParams: creationParams,
               creationParamsCodec: const StandardMessageCodec(),
@@ -528,6 +529,21 @@ class _JoliboxBannerAdState extends State<JoliboxBannerAd> {
         return;
       }
       if (call.method == 'onLoaded') {
+        final arguments = call.arguments as Map<Object?, Object?>?;
+        if (widget.size.isAdaptive) {
+          final height = (arguments?['height'] as num?)?.toDouble();
+          if (height == null || !height.isFinite || height <= 0) {
+            (widget.callbacks?.onFailedToLoad ?? widget.onFailedToLoad)?.call(
+              PlatformException(
+                code: 'ADS_INVALID_AD_SIZE',
+                message:
+                    'The loaded adaptive Banner did not provide a valid height.',
+              ),
+            );
+            return;
+          }
+          setState(() => _resolvedAdaptiveHeight = height);
+        }
         (widget.callbacks?.onLoaded ?? widget.onLoaded)?.call();
       }
       if (call.method == 'onImpression') {
@@ -550,6 +566,9 @@ class _JoliboxBannerAdState extends State<JoliboxBannerAd> {
             message: arguments?['message'] as String?,
           ),
         );
+        if (widget.size.isAdaptive && mounted) {
+          setState(() => _resolvedAdaptiveHeight = null);
+        }
       }
     });
     if (!mounted || _eventChannel != channel) return;
@@ -557,18 +576,74 @@ class _JoliboxBannerAdState extends State<JoliboxBannerAd> {
       await channel.invokeMethod<void>('loadBanner');
     } on PlatformException catch (error) {
       if (mounted && _eventChannel == channel) {
-        (widget.callbacks?.onFailedToLoad ?? widget.onFailedToLoad)
-            ?.call(error);
+        (widget.callbacks?.onFailedToLoad ?? widget.onFailedToLoad)?.call(
+          error,
+        );
       }
     }
   }
 }
 
-enum JoliboxBannerSize {
-  banner(50),
-  largeBanner(100),
-  mediumRectangle(250);
+class JoliboxBannerSize {
+  const JoliboxBannerSize._fixed(this.name, this.fixedHeight)
+    : width = null,
+      maxHeight = null;
 
-  const JoliboxBannerSize(this.height);
-  final double height;
+  JoliboxBannerSize.largeAnchoredAdaptive({required double width})
+    : this._adaptive('largeAnchoredAdaptive', width, null);
+
+  JoliboxBannerSize.inlineAdaptive({required double width, double? maxHeight})
+    : this._adaptive('inlineAdaptive', width, maxHeight);
+
+  JoliboxBannerSize._adaptive(this.name, double width, this.maxHeight)
+    : fixedHeight = null,
+      width = width {
+    if (!width.isFinite || width <= 0) {
+      throw ArgumentError.value(
+        width,
+        'width',
+        'Adaptive Banner width must be finite and greater than zero.',
+      );
+    }
+    if (maxHeight != null && (!maxHeight!.isFinite || maxHeight! < 32)) {
+      throw ArgumentError.value(
+        maxHeight,
+        'maxHeight',
+        'Inline adaptive Banner maxHeight must be finite and at least 32.',
+      );
+    }
+  }
+
+  static const banner = JoliboxBannerSize._fixed('banner', 50);
+  static const largeBanner = JoliboxBannerSize._fixed('largeBanner', 100);
+  static const mediumRectangle = JoliboxBannerSize._fixed(
+    'mediumRectangle',
+    250,
+  );
+
+  final String name;
+  final double? fixedHeight;
+  final double? width;
+  final double? maxHeight;
+
+  bool get isAdaptive => width != null;
+
+  String get identity => '$name:$width:$maxHeight';
+
+  Map<String, Object> get creationParams => {
+    'size': name,
+    if (width != null) 'width': width!,
+    if (maxHeight != null) 'maxHeight': maxHeight!,
+  };
+
+  @override
+  bool operator ==(Object other) =>
+      other is JoliboxBannerSize &&
+      name == other.name &&
+      fixedHeight == other.fixedHeight &&
+      width == other.width &&
+      maxHeight == other.maxHeight;
+
+  @override
+  int get hashCode => Object.hash(name, fixedHeight, width, maxHeight);
 }

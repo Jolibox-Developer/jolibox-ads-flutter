@@ -7,7 +7,7 @@
 ## 当前交付状态
 
 - **Android：** 当前已验证的交付目标。
-- **iOS：** 通过公开的 iOS SDK `0.3.0` Release 和 Swift Package Manager 交付。CocoaPods 不是受支持的 iOS 交付方式；生产接入前仍需完成宿主运行时验收。
+- **iOS：** 通过匹配的公开 iOS SDK Release 和 Swift Package Manager 交付。CocoaPods 不是受支持的 iOS 交付方式；生产接入前仍需完成宿主运行时验收。
 
 ## 架构边界
 
@@ -30,7 +30,7 @@ dependencies:
   jolibox_ads_flutter:
     git:
       url: https://github.com/Jolibox-Developer/jolibox-ads-flutter.git
-      ref: v0.3.0
+      ref: v0.4.0
 ```
 
 然后执行：
@@ -63,7 +63,7 @@ allprojects {
 
 ```gradle
 dependencies {
-  implementation 'com.jolibox.android:jolibox-platform-sdk-all:1.9.0-rc.22399'
+  implementation 'com.jolibox.android:jolibox-platform-sdk-all:1.9.0-rc.23239'
 }
 ```
 
@@ -75,9 +75,31 @@ dependencies {
 
 Flutter 页面可以嵌入已有 Android 应用；Flutter 只负责调用桥接，不负责原生初始化。
 
+### 自定义或缓存 FlutterEngine
+
+标准 `FlutterActivity` 流程不需要额外编写 Jolibox 插件注册代码。若宿主自行创建或缓存 `FlutterEngine`，请遵循 Flutter 官方混编生命周期：缓存前先执行 Dart entrypoint，再通过 `FlutterActivity.withCachedEngine(...)` 附着到页面。全屏广告需要前台 Activity，因此必须保留默认的 Activity attachment。
+
+```kotlin
+val flutterEngine = FlutterEngine(applicationContext)
+flutterEngine.dartExecutor.executeDartEntrypoint(
+  DartExecutor.DartEntrypoint.createDefault(),
+)
+FlutterEngineCache.getInstance().put("host_ads_engine", flutterEngine)
+
+startActivity(
+  FlutterActivity.withCachedEngine("host_ads_engine").build(this),
+)
+```
+
+请使用宿主项目原有的 Flutter 自动生成插件注册方式；不要手动创建 `JoliboxAdsFlutterPlugin`，也不要在 Dart 中初始化 Jolibox 或 AdMob。
+
 ## Flutter 调用
 
 业务 `scene` 由宿主业务与 Jolibox 约定，是路由键，不是广告位 ID。渠道、广告位和内部配置均由原生 SDK 处理。
+
+### 0.4.0 源码兼容性
+
+`JoliboxBannerSize` 已改为 class，以便自适应构造方法接收宽度和可选最大高度。常用固定尺寸调用保持不变：`JoliboxBannerSize.banner`、`JoliboxBannerSize.largeBanner`、`JoliboxBannerSize.mediumRectangle`。若旧代码依赖 Dart `enum` 成员（`values`、`index` 或穷尽 `switch` 语义），则必须迁移并使用 `0.4.0` 重新编译。
 
 ### Banner
 
@@ -98,6 +120,32 @@ JoliboxBannerAd(
 ```
 
 按照 Flutter 页面生命周期销毁 Banner widget，不要继续挂载已销毁的 Banner，也不要复用已销毁的原生 View。
+
+### 自适应 Banner
+
+必须传入 Banner 父布局实际可用的宽度；插件不会推断屏幕宽度。推荐通过 `LayoutBuilder` 获取约束：
+
+```dart
+LayoutBuilder(
+  builder: (context, constraints) => JoliboxBannerAd(
+    scene: 'YOUR_BANNER_SCENE',
+    size: JoliboxBannerSize.largeAnchoredAdaptive(
+      width: constraints.maxWidth,
+    ),
+  ),
+)
+```
+
+页面顶部或底部固定展示使用 `largeAnchoredAdaptive`；滚动内容内嵌使用 `inlineAdaptive`。`maxHeight` 可选，传入时至少为 `32` logical pixel：
+
+```dart
+JoliboxBannerAd(
+  scene: 'YOUR_INLINE_BANNER_SCENE',
+  size: JoliboxBannerSize.inlineAdaptive(width: bannerWidth, maxHeight: 100),
+)
+```
+
+自适应 Banner 在广告加载前或加载失败后不预留最终 Banner 高度；内部会保留 1 logical pixel 的启动布局，以便原生 PlatformView 开始加载，成功后由桥接替换为 Google Mobile Ads 实际解析出的尺寸。修改 scene、尺寸模式、宽度或 `maxHeight` 会销毁旧原生 Banner 并重新请求。
 
 ### 插屏和激励
 
