@@ -1,36 +1,75 @@
-group 'com.jolibox.android.sdk.ads.flutter'
-version '0.4.0'
+group = "com.jolibox.admediation.jolibox_ads_flutter"
+version = "0.5.0"
 
 buildscript {
+    ext.kotlin_version = "2.2.0"
     repositories {
         google()
         mavenCentral()
     }
+
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.2.2'
+        classpath("com.android.tools.build:gradle:8.13.0")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
     }
 }
 
-apply plugin: 'com.android.library'
-
-repositories {
-    google()
-    mavenCentral()
-    maven { url 'https://repo.jolibox.com/repository/public/' }
-    maven { url 'https://repo.jolibox.com/repository/android-internal/' }
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
 }
 
-def joliboxAdsVersion = project.findProperty('joliboxAdsVersion') ?: '1.9.0-rc.23239'
+apply plugin: "com.android.library"
+apply plugin: "kotlin-android"
 
 android {
-    namespace 'com.jolibox.android.sdk.ads.flutter'
-    compileSdk 35
+    if (project.android.hasProperty("namespace")) {
+        namespace = "com.jolibox.admediation.jolibox_ads_flutter"
+    }
+
+    compileSdk = 35
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+
+    sourceSets {
+        main.java.srcDirs += "src/main/kotlin"
+        test.java.srcDirs += "src/test/kotlin"
+    }
 
     defaultConfig {
-        minSdk 23
+        minSdk = 23
     }
-}
 
-dependencies {
-    implementation "com.jolibox.android:jolibox-platform-sdk-all:$joliboxAdsVersion"
+    dependencies {
+        def localMediationAar = project.findProperty("joliboxMediationLocalAar")
+        if (localMediationAar != null) {
+            compileOnly(files(localMediationAar))
+            implementation("com.google.android.gms:play-services-ads:24.0.0")
+        } else {
+            api("com.jolibox.android:jolibox-ad-mediation:0.5.0")
+        }
+        testImplementation("org.jetbrains.kotlin:kotlin-test")
+        testImplementation("org.mockito:mockito-core:5.0.0")
+    }
+
+    testOptions {
+        unitTests.all {
+            useJUnitPlatform()
+
+            testLogging {
+               events "passed", "skipped", "failed", "standardOut", "standardError"
+               outputs.upToDateWhen {false}
+               showStandardStreams = true
+            }
+        }
+    }
 }

@@ -1,19 +1,31 @@
-Pod::Spec.new do |spec|
-  spec.name = 'jolibox_ads_flutter'
-  spec.version = '0.3.0'
-  spec.summary = 'Flutter bridge for the Jolibox Host Ads SDK.'
-  spec.description = <<-DESC
-Flutter MethodChannel and PlatformView bridge for a native Jolibox Host Ads SDK.
-The native host owns SDK initialization; Flutter only loads and shows scene-based ads.
-DESC
-  spec.homepage = 'https://github.com/Jolibox-Developer/jolibox-ads-flutter'
-  spec.license = { :type => 'Proprietary', :file => '../LICENSE' }
-  spec.author = { 'Jolibox Pte. Ltd.' => 'contact@jolibox.com' }
-  spec.source = { :path => '.' }
-  spec.source_files = 'jolibox_ads_flutter/Sources/jolibox_ads_flutter/**/*.{swift,h,m}'
-  spec.ios.deployment_target = '15.0'
-  spec.dependency 'Flutter'
-  spec.swift_version = '5.0'
+#
+# To learn more about a Podspec see http://guides.cocoapods.org/syntax/podspec.html.
+# Run `pod lib lint jolibox_ads_flutter.podspec` to validate before publishing.
+#
+Pod::Spec.new do |s|
+  s.name             = 'jolibox_ads_flutter'
+  s.version          = '0.5.0'
+  s.summary          = 'Flutter bridge for Jolibox Ad Mediation.'
+  s.description      = <<-DESC
+Flutter bridge for the Jolibox native ad mediation SDK.
+                       DESC
+  s.homepage         = 'https://github.com/Jolibox-Developer/jolibox-ads-flutter'
+  s.license          = { :file => '../LICENSE' }
+  s.author           = 'Jolibox'
+  s.source           = { :path => '.' }
+  s.source_files = 'Classes/**/*'
+  s.vendored_frameworks = 'Frameworks/JoliboxAdMediation.xcframework'
+  s.static_framework = true
+  s.dependency 'Flutter'
+  s.dependency 'Google-Mobile-Ads-SDK', '12.1.0'
+  s.platform = :ios, '13.0'
 
-  raise 'jolibox_ads_flutter iOS integration requires Flutter Swift Package Manager. Enable it with `flutter config --enable-swift-package-manager`; CocoaPods is not supported.'
+  # Flutter.framework does not contain a i386 slice.
+  s.pod_target_xcconfig = {
+    'DEFINES_MODULE' => 'YES',
+    'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386',
+    'FRAMEWORK_SEARCH_PATHS[sdk=iphonesimulator*]' => '$(inherited) "$(PODS_TARGET_SRCROOT)/Frameworks/JoliboxAdMediation.xcframework/ios-arm64_x86_64-simulator"',
+    'FRAMEWORK_SEARCH_PATHS[sdk=iphoneos*]' => '$(inherited) "$(PODS_TARGET_SRCROOT)/Frameworks/JoliboxAdMediation.xcframework/ios-arm64"'
+  }
+  s.swift_version = '5.0'
 end
