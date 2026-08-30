@@ -48,6 +48,10 @@ Flutter 桥接依赖 `com.jolibox.android:jolibox-ad-mediation:0.5.0`，并会�
 
 ### iOS
 
+`0.5.0` 固定要求 Flutter `3.22.3`，iOS 制品仅通过 CocoaPods 交付。旧版本文档中
+基于 Flutter Swift Package Manager 的接入方式不支持用于本版本。已有 iOS 宿主必须
+迁移到下方的 CocoaPods 步骤；若无法使用 CocoaPods，则无法接入 `0.5.0`。
+
 插件通过 CocoaPods 链接随包提供的原生 XCFramework。在 Flutter 应用根目录执行：
 
 ```bash
@@ -122,3 +126,8 @@ await JoliboxAdsFlutter.initialize(
 `onAdShowedFullScreenContent`、`onAdImpression`、`onAdClicked`、
 `onAdDismissedFullScreenContent`、`onAdFailedToShowFullScreenContent`。
 Banner 支持加载成功、加载失败、曝光、点击、打开和关闭回调。
+
+所有公开 `PlatformException.code` 均使用 `ADS_` 前缀。既有广告错误包括
+`ADS_LOAD_FAILED`、`ADS_SHOW_FAILED`、`ADS_AD_NOT_FOUND`、
+`ADS_ACTIVITY_REQUIRED` 和 `ADS_SHOW_IN_PROGRESS`。初始化和配置类错误同样使用
+`ADS_` 前缀。

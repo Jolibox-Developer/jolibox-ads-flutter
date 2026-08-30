@@ -56,6 +56,12 @@ exact configuration value is provided separately for your integration.
 
 ### iOS
 
+`0.5.0` requires Flutter `3.22.3` and uses CocoaPods for iOS delivery. The
+Flutter Swift Package Manager integration documented for earlier releases is
+not supported by this release. An existing iOS host must migrate to the
+CocoaPods steps below; if CocoaPods cannot be used, it cannot integrate
+`0.5.0`.
+
 The plugin links its bundled native XCFramework through CocoaPods. From the
 Flutter application root, run:
 
@@ -135,5 +141,10 @@ to `onAdShowedFullScreenContent`, `onAdImpression`, `onAdClicked`,
 `onAdDismissedFullScreenContent`, and `onAdFailedToShowFullScreenContent`.
 Banner callbacks map to loaded, load failed, impression, click, opened, and
 closed events.
+
+All public `PlatformException.code` values use the `ADS_` prefix. Established
+ad errors include `ADS_LOAD_FAILED`, `ADS_SHOW_FAILED`,
+`ADS_AD_NOT_FOUND`, `ADS_ACTIVITY_REQUIRED`, and `ADS_SHOW_IN_PROGRESS`.
+Initialization and configuration errors use the same `ADS_` prefix.
 
 For a Chinese version, see [README_CN.md](README_CN.md).
