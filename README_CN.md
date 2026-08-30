@@ -38,11 +38,11 @@ dependencies:
 repositories {
   google()
   mavenCentral()
-  maven { url = uri("https://raw.githubusercontent.com/Jolibox-Developer/jolibox-ad-mediation-android-maven/0.5.0/") }
+  maven { url = uri("https://raw.githubusercontent.com/Jolibox-Developer/jolibox-ad-mediation-android-maven/0.6.0/") }
 }
 ```
 
-Flutter 桥接依赖 `com.jolibox.android:jolibox-ad-mediation:0.5.0`，并会传递
+Flutter 桥接依赖 `com.jolibox.android:jolibox-ad-mediation:0.6.0`，并会传递
 解析 Google Mobile Ads `24.0.0`。仅消费发布的 AAR 不需要安装 Android NDK。
 请在 Android 应用启动阶段完成一次原生初始化。
 

@@ -4002,161 +4002,161 @@
   },
   "ConstValues": [
     {
-      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/.worktree\/JAM-F260829085500-IOS-Flutter-Core\/ios\/Sources\/JoliboxAdMediation\/JoliboxAdMediation.swift",
+      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/ios\/Sources\/JoliboxAdMediation\/JoliboxAdMediation.swift",
       "kind": "BooleanLiteral",
       "offset": 240,
       "length": 4,
       "value": "true"
     },
     {
-      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/.worktree\/JAM-F260829085500-IOS-Flutter-Core\/ios\/Sources\/JoliboxAdMediation\/JoliboxAdMediation.swift",
+      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/ios\/Sources\/JoliboxAdMediation\/JoliboxAdMediation.swift",
       "kind": "BooleanLiteral",
       "offset": 297,
       "length": 4,
       "value": "true"
     },
     {
-      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/.worktree\/JAM-F260829085500-IOS-Flutter-Core\/ios\/Sources\/JoliboxAdMediation\/MediationCore.swift",
+      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/ios\/Sources\/JoliboxAdMediation\/MediationCore.swift",
       "kind": "Array",
       "offset": 839,
       "length": 2,
       "value": "[]"
     },
     {
-      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/.worktree\/JAM-F260829085500-IOS-Flutter-Core\/ios\/Sources\/JoliboxAdMediation\/MediationCore.swift",
+      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/ios\/Sources\/JoliboxAdMediation\/MediationCore.swift",
       "kind": "BooleanLiteral",
       "offset": 885,
       "length": 5,
       "value": "false"
     },
     {
-      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/.worktree\/JAM-F260829085500-IOS-Flutter-Core\/ios\/Sources\/JoliboxAdMediation\/MediationCore.swift",
+      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/ios\/Sources\/JoliboxAdMediation\/MediationCore.swift",
       "kind": "StringLiteral",
       "offset": 21101,
       "length": 24,
       "value": "\"jolibox.banner.awaiter\""
     },
     {
-      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/.worktree\/JAM-F260829085500-IOS-Flutter-Core\/ios\/Sources\/JoliboxAdMediation\/PublicAPI.swift",
+      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/ios\/Sources\/JoliboxAdMediation\/PublicAPI.swift",
       "kind": "StringLiteral",
       "offset": 497,
       "length": 18,
       "value": "\"INVALID_ARGUMENT\""
     },
     {
-      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/.worktree\/JAM-F260829085500-IOS-Flutter-Core\/ios\/Sources\/JoliboxAdMediation\/PublicAPI.swift",
+      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/ios\/Sources\/JoliboxAdMediation\/PublicAPI.swift",
       "kind": "StringLiteral",
       "offset": 537,
       "length": 21,
       "value": "\"INVALID_JOLI_SOURCE\""
     },
     {
-      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/.worktree\/JAM-F260829085500-IOS-Flutter-Core\/ios\/Sources\/JoliboxAdMediation\/PublicAPI.swift",
+      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/ios\/Sources\/JoliboxAdMediation\/PublicAPI.swift",
       "kind": "StringLiteral",
       "offset": 577,
       "length": 17,
       "value": "\"NOT_INITIALIZED\""
     },
     {
-      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/.worktree\/JAM-F260829085500-IOS-Flutter-Core\/ios\/Sources\/JoliboxAdMediation\/PublicAPI.swift",
+      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/ios\/Sources\/JoliboxAdMediation\/PublicAPI.swift",
       "kind": "StringLiteral",
       "offset": 621,
       "length": 25,
       "value": "\"INITIALIZATION_CONFLICT\""
     },
     {
-      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/.worktree\/JAM-F260829085500-IOS-Flutter-Core\/ios\/Sources\/JoliboxAdMediation\/PublicAPI.swift",
+      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/ios\/Sources\/JoliboxAdMediation\/PublicAPI.swift",
       "kind": "StringLiteral",
       "offset": 670,
       "length": 22,
       "value": "\"SETTINGS_UNAVAILABLE\""
     },
     {
-      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/.worktree\/JAM-F260829085500-IOS-Flutter-Core\/ios\/Sources\/JoliboxAdMediation\/PublicAPI.swift",
+      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/ios\/Sources\/JoliboxAdMediation\/PublicAPI.swift",
       "kind": "StringLiteral",
       "offset": 717,
       "length": 23,
       "value": "\"CONFIGURATION_INVALID\""
     },
     {
-      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/.worktree\/JAM-F260829085500-IOS-Flutter-Core\/ios\/Sources\/JoliboxAdMediation\/PublicAPI.swift",
+      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/ios\/Sources\/JoliboxAdMediation\/PublicAPI.swift",
       "kind": "StringLiteral",
       "offset": 758,
       "length": 17,
       "value": "\"SCENE_NOT_FOUND\""
     },
     {
-      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/.worktree\/JAM-F260829085500-IOS-Flutter-Core\/ios\/Sources\/JoliboxAdMediation\/PublicAPI.swift",
+      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/ios\/Sources\/JoliboxAdMediation\/PublicAPI.swift",
       "kind": "StringLiteral",
       "offset": 800,
       "length": 24,
       "value": "\"NO_AVAILABLE_PLACEMENT\""
     },
     {
-      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/.worktree\/JAM-F260829085500-IOS-Flutter-Core\/ios\/Sources\/JoliboxAdMediation\/PublicAPI.swift",
+      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/ios\/Sources\/JoliboxAdMediation\/PublicAPI.swift",
       "kind": "StringLiteral",
       "offset": 841,
       "length": 16,
       "value": "\"AD_LOAD_FAILED\""
     },
     {
-      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/.worktree\/JAM-F260829085500-IOS-Flutter-Core\/ios\/Sources\/JoliboxAdMediation\/PublicAPI.swift",
+      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/ios\/Sources\/JoliboxAdMediation\/PublicAPI.swift",
       "kind": "StringLiteral",
       "offset": 874,
       "length": 16,
       "value": "\"AD_SHOW_FAILED\""
     },
     {
-      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/.worktree\/JAM-F260829085500-IOS-Flutter-Core\/ios\/Sources\/JoliboxAdMediation\/PublicAPI.swift",
+      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/ios\/Sources\/JoliboxAdMediation\/PublicAPI.swift",
       "kind": "StringLiteral",
       "offset": 905,
       "length": 13,
       "value": "\"AD_CONSUMED\""
     },
     {
-      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/.worktree\/JAM-F260829085500-IOS-Flutter-Core\/ios\/Sources\/JoliboxAdMediation\/PublicAPI.swift",
+      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/ios\/Sources\/JoliboxAdMediation\/PublicAPI.swift",
       "kind": "StringLiteral",
       "offset": 3015,
       "length": 2,
       "value": "\"\""
     },
     {
-      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/.worktree\/JAM-F260829085500-IOS-Flutter-Core\/ios\/Sources\/JoliboxAdMediation\/PublicAPI.swift",
+      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/ios\/Sources\/JoliboxAdMediation\/PublicAPI.swift",
       "kind": "BooleanLiteral",
       "offset": 3045,
       "length": 5,
       "value": "false"
     },
     {
-      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/.worktree\/JAM-F260829085500-IOS-Flutter-Core\/ios\/Sources\/JoliboxAdMediation\/PublicAPI.swift",
+      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/ios\/Sources\/JoliboxAdMediation\/PublicAPI.swift",
       "kind": "StringLiteral",
       "offset": 4689,
       "length": 2,
       "value": "\"\""
     },
     {
-      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/.worktree\/JAM-F260829085500-IOS-Flutter-Core\/ios\/Sources\/JoliboxAdMediation\/PublicAPI.swift",
+      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/ios\/Sources\/JoliboxAdMediation\/PublicAPI.swift",
       "kind": "BooleanLiteral",
       "offset": 4716,
       "length": 5,
       "value": "false"
     },
     {
-      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/.worktree\/JAM-F260829085500-IOS-Flutter-Core\/ios\/Sources\/JoliboxAdMediation\/PublicAPI.swift",
+      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/ios\/Sources\/JoliboxAdMediation\/PublicAPI.swift",
       "kind": "StringLiteral",
       "offset": 6401,
       "length": 2,
       "value": "\"\""
     },
     {
-      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/.worktree\/JAM-F260829085500-IOS-Flutter-Core\/ios\/Sources\/JoliboxAdMediation\/PublicAPI.swift",
+      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/ios\/Sources\/JoliboxAdMediation\/PublicAPI.swift",
       "kind": "BooleanLiteral",
       "offset": 6428,
       "length": 5,
       "value": "false"
     },
     {
-      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/.worktree\/JAM-F260829085500-IOS-Flutter-Core\/ios\/Sources\/JoliboxAdMediation\/PublicAPI.swift",
+      "filePath": "\/Users\/zzzzz\/workspace\/jolibox-ad-mediation\/ios\/Sources\/JoliboxAdMediation\/PublicAPI.swift",
       "kind": "BooleanLiteral",
       "offset": 6458,
       "length": 5,

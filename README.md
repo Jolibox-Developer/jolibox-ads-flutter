@@ -43,11 +43,11 @@ target.
 repositories {
   google()
   mavenCentral()
-  maven { url = uri("https://raw.githubusercontent.com/Jolibox-Developer/jolibox-ad-mediation-android-maven/0.5.0/") }
+  maven { url = uri("https://raw.githubusercontent.com/Jolibox-Developer/jolibox-ad-mediation-android-maven/0.6.0/") }
 }
 ```
 
-The Flutter bridge uses `com.jolibox.android:jolibox-ad-mediation:0.5.0`,
+The Flutter bridge uses `com.jolibox.android:jolibox-ad-mediation:0.6.0`,
 which transitively resolves Google Mobile Ads `24.0.0`. The Android NDK is not
 required merely to consume the released AAR.
 
