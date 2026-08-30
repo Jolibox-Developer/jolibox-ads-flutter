@@ -51,8 +51,21 @@ private final class ExampleAdsInitialization {
       }
 
       let environmentValue = (Bundle.main.object(forInfoDictionaryKey: "JoliboxEnvironment") as? String ?? "staging")
+        .trimmingCharacters(in: .whitespacesAndNewlines)
         .lowercased()
-      let environment: MediationEnvironment = environmentValue == "production" ? .production : .staging
+      let environment: MediationEnvironment
+      switch environmentValue {
+      case "staging":
+        environment = .staging
+      case "production":
+        environment = .production
+      default:
+        update(
+          state: "notConfigured",
+          message: "Set JOLIBOX_ENVIRONMENT to staging or production in ios/Runner/Config/Jolibox.local.xcconfig before running the example."
+        )
+        return
+      }
       update(state: "initializing", message: "Initializing native SDK for \(environment.rawValue).")
       JoliboxAds.initialize(joliSource: source, environment: environment) { [weak self] response in
         switch response {

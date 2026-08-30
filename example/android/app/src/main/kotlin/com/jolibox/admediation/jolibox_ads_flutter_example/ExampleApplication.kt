@@ -33,9 +33,17 @@ internal object ExampleAdsInitialization {
             return
         }
 
-        val environment = when (BuildConfig.JOLIBOX_MEDIATION_ENVIRONMENT.lowercase()) {
+        val environmentValue = BuildConfig.JOLIBOX_MEDIATION_ENVIRONMENT.trim().lowercase()
+        val environment = when (environmentValue) {
             "production" -> MediationEnvironment.PRODUCTION
-            else -> MediationEnvironment.STAGING
+            "staging" -> MediationEnvironment.STAGING
+            else -> {
+                update(
+                    state = "notConfigured",
+                    message = "Set jolibox.environment to staging or production in android/local.properties.",
+                )
+                return
+            }
         }
         update("initializing", "Initializing native SDK for ${environment.name.lowercase()}.")
         JoliboxAds.initialize(application, joliSource, environment, object : InitializationCallback {

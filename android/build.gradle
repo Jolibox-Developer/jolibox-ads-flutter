@@ -1,5 +1,5 @@
 group = "com.jolibox.admediation.jolibox_ads_flutter"
-version = "0.6.2"
+version = "0.6.3"
 
 buildscript {
     ext.kotlin_version = "2.2.0"
@@ -55,7 +55,7 @@ android {
             compileOnly(files(localMediationAar))
             implementation("com.google.android.gms:play-services-ads:24.0.0")
         } else {
-            api("com.jolibox.android:jolibox-ad-mediation:0.6.0")
+            api("com.jolibox.android:jolibox-ad-mediation:0.6.1")
         }
         testImplementation("org.jetbrains.kotlin:kotlin-test")
         testImplementation("org.mockito:mockito-core:5.0.0")

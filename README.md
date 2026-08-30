@@ -36,7 +36,7 @@ dependencies:
   jolibox_ads_flutter:
     git:
       url: https://github.com/Jolibox-Developer/jolibox-ads-flutter.git
-      ref: 0.6.2
+      ref: 0.6.3
 ```
 
 Run `flutter pub get` after updating `pubspec.yaml`.
@@ -54,11 +54,11 @@ target.
 repositories {
   google()
   mavenCentral()
-  maven { url = uri("https://raw.githubusercontent.com/Jolibox-Developer/jolibox-ad-mediation-android-maven/0.6.0/") }
+  maven { url = uri("https://raw.githubusercontent.com/Jolibox-Developer/jolibox-ad-mediation-android-maven/0.6.1/") }
 }
 ```
 
-The Flutter bridge uses `com.jolibox.android:jolibox-ad-mediation:0.6.0`,
+The Flutter bridge uses `com.jolibox.android:jolibox-ad-mediation:0.6.1`,
 which transitively resolves Google Mobile Ads `24.0.0`. The Android NDK is not
 required merely to consume the released AAR.
 
@@ -86,13 +86,13 @@ class HostApplication : Application() {
 
 ### iOS
 
-Flutter bridge `0.6.2` requires Flutter `3.22.3` and uses CocoaPods for iOS
-delivery. It continues to bundle the matching native mediation `0.6.0`
-artifact; keep the Android Maven repository at `0.6.0` unless a later native
+Flutter bridge `0.6.3` requires Flutter `3.22.3` and uses CocoaPods for iOS
+delivery. It bundles the matching native mediation `0.6.1`
+artifact; keep the Android Maven repository at `0.6.1` unless a later native
 SDK release is supplied. The Flutter Swift Package Manager integration
 documented for earlier releases is not supported by this release. An existing
 iOS host must migrate to the CocoaPods steps below; if CocoaPods cannot be used, it cannot integrate
-`0.6.2`.
+`0.6.3`.
 
 The plugin links its bundled native XCFramework through CocoaPods. From the
 Flutter application root, run:

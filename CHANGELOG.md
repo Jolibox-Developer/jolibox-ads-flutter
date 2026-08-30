@@ -2,6 +2,21 @@
 
 > 中文说明：[CHANGELOG_CN.md](CHANGELOG_CN.md)
 
+## 0.6.3
+
+- Aligns Flutter package, Android Gradle plugin, and CocoaPods metadata at `0.6.3`.
+- Updates the Android native mediation dependency to `0.6.1`.
+- Removes embedded Swift ABI metadata that exposed local build paths.
+- Makes invalid example environment values fail explicitly instead of falling back to staging.
+
+## 0.6.2
+
+- Aligns public Git dependency references to the `0.6.2` Flutter bridge release.
+
+## 0.6.1
+
+- Adds the runnable mixed Android/iOS host example and bilingual integration guidance.
+
 ## 0.6.0
 
 - Normalizes all public Flutter ad errors to the `ADS_` prefix.

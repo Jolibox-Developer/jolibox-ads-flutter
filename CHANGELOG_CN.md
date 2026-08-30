@@ -2,6 +2,21 @@
 
 > English documentation: [CHANGELOG.md](CHANGELOG.md)
 
+## 0.6.3
+
+- 将 Flutter 包、Android Gradle 插件和 CocoaPods 元数据统一为 `0.6.3`。
+- Android 原生聚合依赖升级至 `0.6.1`。
+- 删除会暴露本机构建路径的 Swift ABI 元数据。
+- 示例中的非法环境值会明确失败，不再静默回落到 staging。
+
+## 0.6.2
+
+- 将公开 Git 依赖引用统一为 `0.6.2` Flutter bridge 版本。
+
+## 0.6.1
+
+- 新增可运行的 Android/iOS 混编宿主示例和双语接入说明。
+
 ## 0.6.0
 
 - 统一 Flutter 对外广告错误码为 `ADS_` 前缀。
