@@ -15,6 +15,14 @@ Jolibox Ad Mediation 原生 SDK 的 Flutter 桥接，支持 Android 与 iOS 的
 宿主应在 Flutter 页面渲染或加载广告前完成原生 SDK 初始化。Flutter 的可选
 初始化接口只会委托给同一份原生 SDK 状态，不会创建第二份配置或广告状态。
 
+## 混编示例
+
+[`example/`](example/) 是完整的 Android/iOS 混编宿主示例，不是只包含 Flutter
+调用的代码片段。Android 的 `Application` 和 iOS 的 `AppDelegate` 分别负责原生
+SDK 初始化；Flutter 页面演示 Banner Widget，以及插屏/激励视频的 `load → show`
+生命周期。仓库仅含占位符，本地配置文件均已 Git 忽略。运行前请先阅读
+[示例说明](example/README_CN.md)。
+
 ## 添加依赖
 
 ```yaml
@@ -46,6 +54,23 @@ Flutter 桥接依赖 `com.jolibox.android:jolibox-ad-mediation:0.6.0`，并会�
 解析 Google Mobile Ads `24.0.0`。仅消费发布的 AAR 不需要安装 Android NDK。
 请在 Android 应用启动阶段完成一次原生初始化。
 
+```kotlin
+class HostApplication : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        JoliboxAds.initialize(
+            this,
+            "YOUR_JOLI_SOURCE",
+            MediationEnvironment.STAGING,
+            object : InitializationCallback {
+                override fun onInitialized() {}
+                override fun onInitializationFailed(error: JoliboxAdError) {}
+            },
+        )
+    }
+}
+```
+
 ### iOS
 
 `0.6.0` 固定要求 Flutter `3.22.3`，iOS 制品仅通过 CocoaPods 交付。旧版本文档中
@@ -62,6 +87,17 @@ cd ios && pod install && cd ..
 同一个 iOS application target 不应再通过 Swift Package Manager 引入
 `JoliboxAdMediation`；Flutter 插件已经内置匹配的 framework。请在 iOS 应用
 启动阶段完成一次原生初始化。
+
+```swift
+import JoliboxAdMediation
+
+JoliboxAds.initialize(
+  joliSource: "YOUR_JOLI_SOURCE",
+  environment: .staging
+) { result in
+  // 在 Flutter 加载广告前处理初始化成功或失败。
+}
+```
 
 ## Banner Widget
 

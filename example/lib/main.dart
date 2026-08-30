@@ -4,13 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:jolibox_ads_flutter/jolibox_ads_flutter.dart';
 
-const _joliSource = String.fromEnvironment('JOLIBOX_JOLI_SOURCE');
+import 'example_native_initialization.dart';
+
 const _scene =
     String.fromEnvironment('JOLIBOX_SCENE', defaultValue: 'YOUR_SCENE');
-const _environment = String.fromEnvironment(
-  'JOLIBOX_ENVIRONMENT',
-  defaultValue: 'staging',
-);
 
 void main() => runApp(const JoliboxAdsExampleApp());
 
@@ -37,22 +34,16 @@ class _JoliboxAdsExamplePageState extends State<JoliboxAdsExamplePage> {
   JoliboxBannerSize _bannerSize = JoliboxBannerSize.banner;
   JoliboxInterstitialAd? _interstitialAd;
   JoliboxRewardedAd? _rewardedAd;
-  bool _initializing = false;
-  bool _initialized = false;
+  bool _nativeInitialized = false;
   bool _loadingInterstitial = false;
   bool _loadingRewarded = false;
-  String _status = 'Configure the local QA values, then initialize.';
+  String _status = 'Waiting for native SDK initialization.';
 
-  bool get _hasLocalConfiguration =>
-      _joliSource.isNotEmpty &&
-      !_joliSource.startsWith('YOUR_') &&
-      _scene.isNotEmpty &&
-      !_scene.startsWith('YOUR_');
-
-  JoliboxMediationEnvironment get _mediationEnvironment =>
-      _environment.toLowerCase() == 'production'
-          ? JoliboxMediationEnvironment.production
-          : JoliboxMediationEnvironment.staging;
+  @override
+  void initState() {
+    super.initState();
+    unawaited(_waitForNativeInitialization());
+  }
 
   @override
   void dispose() {
@@ -63,27 +54,16 @@ class _JoliboxAdsExamplePageState extends State<JoliboxAdsExamplePage> {
     super.dispose();
   }
 
-  Future<void> _initialize() async {
-    if (!_hasLocalConfiguration) {
-      _setStatus('Missing local QA configuration. See qa.local.json.example.');
-      return;
-    }
-    setState(() => _initializing = true);
-    _setStatus('Initializing ${_mediationEnvironment.name}...');
-    try {
-      await JoliboxAdsFlutter.initialize(
-        joliSource: _joliSource,
-        environment: _mediationEnvironment,
-      );
+  Future<void> _waitForNativeInitialization() async {
+    while (mounted) {
+      final snapshot = await ExampleNativeInitialization.fetch();
       if (!mounted) return;
-      setState(() => _initialized = true);
-      _setStatus('Initialization succeeded. You can now load ads.');
-    } on PlatformException catch (error) {
-      _setStatus('Initialization failed: ${_formatError(error)}');
-    } catch (error) {
-      _setStatus('Initialization failed: $error');
-    } finally {
-      if (mounted) setState(() => _initializing = false);
+      setState(() {
+        _nativeInitialized = snapshot.isReady;
+        _status = snapshot.message;
+      });
+      if (snapshot.isTerminal) return;
+      await Future<void>.delayed(const Duration(milliseconds: 300));
     }
   }
 
@@ -203,7 +183,7 @@ class _JoliboxAdsExamplePageState extends State<JoliboxAdsExamplePage> {
 
   @override
   Widget build(BuildContext context) {
-    final controlsEnabled = _initialized && !_initializing;
+    final controlsEnabled = _nativeInitialized;
     return Scaffold(
       appBar: AppBar(title: const Text('Jolibox Ad Mediation QA')),
       body: SafeArea(
@@ -211,11 +191,10 @@ class _JoliboxAdsExamplePageState extends State<JoliboxAdsExamplePage> {
           padding: const EdgeInsets.all(16),
           children: [
             const Text('Scene: $_scene'),
-            Text('Environment: ${_mediationEnvironment.name}'),
             const SizedBox(height: 12),
-            FilledButton(
-              onPressed: _initializing ? null : _initialize,
-              child: Text(_initializing ? 'Initializing...' : 'Initialize'),
+            const Text(
+              'This mixed-host example initializes the SDK natively. '
+              'Flutter does not call JoliboxAdsFlutter.initialize().',
             ),
             const SizedBox(height: 12),
             _StatusCard(status: _status),
@@ -246,7 +225,9 @@ class _JoliboxAdsExamplePageState extends State<JoliboxAdsExamplePage> {
                 onStatus: _setStatus,
               )
             else
-              const Text('Initialize before rendering the banner.'),
+              const Text(
+                'Wait for native initialization before rendering the banner.',
+              ),
             const SizedBox(height: 24),
             Text('Interstitial', style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 8),

@@ -16,6 +16,15 @@ The native host initializes the SDK before Flutter renders or loads ads. The
 optional Flutter initialization API delegates to that same native SDK; it never
 creates a second configuration or ad state.
 
+## Mixed-host example
+
+[`example/`](example/) is a complete mixed Android/iOS host rather than a
+Flutter-only snippet. Its Android `Application` and iOS `AppDelegate` each
+initialize the native SDK, while its Flutter screen demonstrates the Banner
+Widget and the Interstitial/Rewarded `load → show` lifecycles. It contains only
+placeholders; local configuration files are ignored by Git. See the
+[example guide](example/README.md) before running it.
+
 ## Add the package
 
 Use the tagged package source supplied with your release:
@@ -54,6 +63,23 @@ required merely to consume the released AAR.
 Initialize the native SDK once from the Android application startup path. The
 exact configuration value is provided separately for your integration.
 
+```kotlin
+class HostApplication : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        JoliboxAds.initialize(
+            this,
+            "YOUR_JOLI_SOURCE",
+            MediationEnvironment.STAGING,
+            object : InitializationCallback {
+                override fun onInitialized() {}
+                override fun onInitializationFailed(error: JoliboxAdError) {}
+            },
+        )
+    }
+}
+```
+
 ### iOS
 
 `0.6.0` requires Flutter `3.22.3` and uses CocoaPods for iOS delivery. The
@@ -74,6 +100,17 @@ Do not also add `JoliboxAdMediation` through Swift Package Manager to the same
 iOS application target; the Flutter plugin already bundles the matching
 framework. Initialize the native SDK once from the iOS application startup
 path.
+
+```swift
+import JoliboxAdMediation
+
+JoliboxAds.initialize(
+  joliSource: "YOUR_JOLI_SOURCE",
+  environment: .staging
+) { result in
+  // Handle success or failure before Flutter loads ads.
+}
+```
 
 ## Banner Widget
 

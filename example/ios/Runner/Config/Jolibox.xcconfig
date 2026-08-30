@@ -1,0 +1,4 @@
+JOLIBOX_JOLI_SOURCE = YOUR_JOLI_SOURCE
+JOLIBOX_ENVIRONMENT = staging
+
+#include? "Jolibox.local.xcconfig"

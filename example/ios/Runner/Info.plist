@@ -24,6 +24,10 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>GADApplicationIdentifier</key>
 	<string>ca-app-pub-3940256099942544~1458002511</string>
+	<key>JoliboxEnvironment</key>
+	<string>$(JOLIBOX_ENVIRONMENT)</string>
+	<key>JoliboxJoliSource</key>
+	<string>$(JOLIBOX_JOLI_SOURCE)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
