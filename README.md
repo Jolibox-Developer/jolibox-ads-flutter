@@ -25,7 +25,7 @@ dependencies:
   jolibox_ads_flutter:
     git:
       url: https://github.com/Jolibox-Developer/jolibox-ads-flutter.git
-      ref: 0.5.0
+      ref: 0.6.0
 ```
 
 Run `flutter pub get` after updating `pubspec.yaml`.
@@ -56,11 +56,11 @@ exact configuration value is provided separately for your integration.
 
 ### iOS
 
-`0.5.0` requires Flutter `3.22.3` and uses CocoaPods for iOS delivery. The
+`0.6.0` requires Flutter `3.22.3` and uses CocoaPods for iOS delivery. The
 Flutter Swift Package Manager integration documented for earlier releases is
 not supported by this release. An existing iOS host must migrate to the
 CocoaPods steps below; if CocoaPods cannot be used, it cannot integrate
-`0.5.0`.
+`0.6.0`.
 
 The plugin links its bundled native XCFramework through CocoaPods. From the
 Flutter application root, run:

@@ -2,6 +2,12 @@
 
 > English documentation: [CHANGELOG.md](CHANGELOG.md)
 
+## 0.6.0
+
+- 统一 Flutter 对外广告错误码为 `ADS_` 前缀。
+- 明确 iOS `0.6.0` 通过 CocoaPods 交付，并固定要求 Flutter `3.22.3`。
+- Android Maven 与内置 iOS 原生 SDK 制品继续使用已验收的 `0.5.0`。
+
 ## 0.5.0
 
 - Jolibox Ad Mediation Flutter 桥接首个公开版本。

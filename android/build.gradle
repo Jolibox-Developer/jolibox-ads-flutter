@@ -1,5 +1,5 @@
 group = "com.jolibox.admediation.jolibox_ads_flutter"
-version = "0.5.0"
+version = "0.6.0"
 
 buildscript {
     ext.kotlin_version = "2.2.0"

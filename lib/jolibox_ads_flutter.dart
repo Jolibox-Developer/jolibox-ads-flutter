@@ -382,12 +382,15 @@ class _JoliboxBannerAdState extends State<JoliboxBannerAd> {
   }
 
   Future<void> _onPlatformViewCreated(int id, int generation) async {
-    if (!mounted || generation != _viewGeneration) return;
+    if (!mounted || generation != _viewGeneration) {
+      return;
+    }
     final channel = MethodChannel('jolibox_ads_flutter/banner/$id');
     _eventChannel = channel;
     channel.setMethodCallHandler((call) async {
-      if (!mounted || generation != _viewGeneration || _eventChannel != channel)
+      if (!mounted || generation != _viewGeneration || _eventChannel != channel) {
         return;
+      }
       final arguments = call.arguments as Map<Object?, Object?>?;
       switch (call.method) {
         case 'onLoaded':

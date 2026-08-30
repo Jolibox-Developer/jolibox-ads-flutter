@@ -22,7 +22,7 @@ dependencies:
   jolibox_ads_flutter:
     git:
       url: https://github.com/Jolibox-Developer/jolibox-ads-flutter.git
-      ref: 0.5.0
+      ref: 0.6.0
 ```
 
 更新 `pubspec.yaml` 后执行 `flutter pub get`。
@@ -48,9 +48,9 @@ Flutter 桥接依赖 `com.jolibox.android:jolibox-ad-mediation:0.5.0`，并会�
 
 ### iOS
 
-`0.5.0` 固定要求 Flutter `3.22.3`，iOS 制品仅通过 CocoaPods 交付。旧版本文档中
+`0.6.0` 固定要求 Flutter `3.22.3`，iOS 制品仅通过 CocoaPods 交付。旧版本文档中
 基于 Flutter Swift Package Manager 的接入方式不支持用于本版本。已有 iOS 宿主必须
-迁移到下方的 CocoaPods 步骤；若无法使用 CocoaPods，则无法接入 `0.5.0`。
+迁移到下方的 CocoaPods 步骤；若无法使用 CocoaPods，则无法接入 `0.6.0`。
 
 插件通过 CocoaPods 链接随包提供的原生 XCFramework。在 Flutter 应用根目录执行：
 
