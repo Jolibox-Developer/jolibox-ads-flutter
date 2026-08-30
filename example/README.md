@@ -23,6 +23,7 @@ initialization completion instead.
    [integration guide](../README.md).
 2. Copy `qa.local.json.example` to `qa.local.json` and set `JOLIBOX_SCENE`.
    The local file is ignored by Git.
+   Configure only the native platform that you are about to run.
 3. Append the following native configuration to the ignored
    `android/local.properties` file:
 
@@ -50,9 +51,10 @@ initialization completion instead.
    flutter run --dart-define-from-file=qa.local.json
    ```
 
-`ExampleApplication.kt` reads Android values through `BuildConfig` before
-`FlutterActivity` renders. `AppDelegate.swift` reads the iOS xcconfig values
-before Flutter loads ads. Both `android/local.properties` and
+`ExampleApplication.kt` starts Android initialization through `BuildConfig`
+before `FlutterActivity` renders; the Flutter controls wait for its result.
+`AppDelegate.swift` starts iOS initialization from application startup, and the
+Flutter controls wait before loading ads. Both `android/local.properties` and
 `ios/Runner/Config/Jolibox.local.xcconfig` are ignored by Git.
 
 After native initialization succeeds, the Banner Widget requests its ad

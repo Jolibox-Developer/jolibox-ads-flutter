@@ -12,8 +12,9 @@ Jolibox Ad Mediation 原生 SDK 的 Flutter 桥接，支持 Android 与 iOS 的
 - iOS `13.0` 及以上
 - 已提供对应平台的 Jolibox Ad Mediation 原生 SDK 制品
 
-宿主应在 Flutter 页面渲染或加载广告前完成原生 SDK 初始化。Flutter 的可选
-初始化接口只会委托给同一份原生 SDK 状态，不会创建第二份配置或广告状态。
+宿主应在应用启动阶段发起一次原生 SDK 初始化。Flutter 必须等待原生初始化结果后，
+再渲染 Banner 或加载全屏广告。Flutter 的可选初始化接口只会委托给同一份原生 SDK
+状态，不会创建第二份配置或广告状态。
 
 ## 混编示例
 
@@ -30,7 +31,7 @@ dependencies:
   jolibox_ads_flutter:
     git:
       url: https://github.com/Jolibox-Developer/jolibox-ads-flutter.git
-      ref: 0.6.0
+      ref: 0.6.2
 ```
 
 更新 `pubspec.yaml` 后执行 `flutter pub get`。
@@ -52,7 +53,8 @@ repositories {
 
 Flutter 桥接依赖 `com.jolibox.android:jolibox-ad-mediation:0.6.0`，并会传递
 解析 Google Mobile Ads `24.0.0`。仅消费发布的 AAR 不需要安装 Android NDK。
-请在 Android 应用启动阶段完成一次原生初始化。
+请在 Android 应用启动阶段完成一次原生初始化；若使用 `Application` 子类，需在宿主
+`AndroidManifest.xml` 的 `android:name` 中声明该类。
 
 ```kotlin
 class HostApplication : Application() {
@@ -73,9 +75,11 @@ class HostApplication : Application() {
 
 ### iOS
 
-`0.6.0` 固定要求 Flutter `3.22.3`，iOS 制品仅通过 CocoaPods 交付。旧版本文档中
-基于 Flutter Swift Package Manager 的接入方式不支持用于本版本。已有 iOS 宿主必须
-迁移到下方的 CocoaPods 步骤；若无法使用 CocoaPods，则无法接入 `0.6.0`。
+Flutter 桥接 `0.6.2` 固定要求 Flutter `3.22.3`，iOS 制品仅通过 CocoaPods 交付，
+并继续内置匹配的原生聚合 SDK `0.6.0` 制品；除非后续提供新的原生 SDK，否则 Android
+Maven 仓库仍使用 `0.6.0`。旧版本文档中基于 Flutter Swift Package Manager 的接入方式
+不支持用于本版本。已有 iOS 宿主必须迁移到下方的 CocoaPods 步骤；若无法使用
+CocoaPods，则无法接入 `0.6.2`。
 
 插件通过 CocoaPods 链接随包提供的原生 XCFramework。在 Flutter 应用根目录执行：
 
@@ -86,7 +90,9 @@ cd ios && pod install && cd ..
 
 同一个 iOS application target 不应再通过 Swift Package Manager 引入
 `JoliboxAdMediation`；Flutter 插件已经内置匹配的 framework。请在 iOS 应用
-启动阶段完成一次原生初始化。
+启动阶段发起一次原生初始化；初始化调用应放在
+`AppDelegate.application(_:didFinishLaunchingWithOptions:)` 中，且在
+Flutter 加载任何广告前执行。
 
 ```swift
 import JoliboxAdMediation

@@ -12,9 +12,11 @@ AdMob Banner, Interstitial, and Rewarded ads on Android and iOS.
 - iOS `13.0` or later
 - A released Jolibox Ad Mediation native SDK for each platform
 
-The native host initializes the SDK before Flutter renders or loads ads. The
-optional Flutter initialization API delegates to that same native SDK; it never
-creates a second configuration or ad state.
+The native host starts SDK initialization once during application startup.
+Flutter must wait for the native initialization result before it renders a
+banner or loads a fullscreen ad. The optional Flutter initialization API
+delegates to that same native SDK; it never creates a second configuration or
+ad state.
 
 ## Mixed-host example
 
@@ -34,7 +36,7 @@ dependencies:
   jolibox_ads_flutter:
     git:
       url: https://github.com/Jolibox-Developer/jolibox-ads-flutter.git
-      ref: 0.6.0
+      ref: 0.6.2
 ```
 
 Run `flutter pub get` after updating `pubspec.yaml`.
@@ -61,7 +63,9 @@ which transitively resolves Google Mobile Ads `24.0.0`. The Android NDK is not
 required merely to consume the released AAR.
 
 Initialize the native SDK once from the Android application startup path. The
-exact configuration value is provided separately for your integration.
+exact configuration value is provided separately for your integration. When
+using an `Application` subclass, declare it with `android:name` in the host
+`AndroidManifest.xml`.
 
 ```kotlin
 class HostApplication : Application() {
@@ -82,11 +86,13 @@ class HostApplication : Application() {
 
 ### iOS
 
-`0.6.0` requires Flutter `3.22.3` and uses CocoaPods for iOS delivery. The
-Flutter Swift Package Manager integration documented for earlier releases is
-not supported by this release. An existing iOS host must migrate to the
-CocoaPods steps below; if CocoaPods cannot be used, it cannot integrate
-`0.6.0`.
+Flutter bridge `0.6.2` requires Flutter `3.22.3` and uses CocoaPods for iOS
+delivery. It continues to bundle the matching native mediation `0.6.0`
+artifact; keep the Android Maven repository at `0.6.0` unless a later native
+SDK release is supplied. The Flutter Swift Package Manager integration
+documented for earlier releases is not supported by this release. An existing
+iOS host must migrate to the CocoaPods steps below; if CocoaPods cannot be used, it cannot integrate
+`0.6.2`.
 
 The plugin links its bundled native XCFramework through CocoaPods. From the
 Flutter application root, run:
@@ -99,7 +105,8 @@ cd ios && pod install && cd ..
 Do not also add `JoliboxAdMediation` through Swift Package Manager to the same
 iOS application target; the Flutter plugin already bundles the matching
 framework. Initialize the native SDK once from the iOS application startup
-path.
+path, in `AppDelegate.application(_:didFinishLaunchingWithOptions:)`, before
+Flutter loads any ads.
 
 ```swift
 import JoliboxAdMediation

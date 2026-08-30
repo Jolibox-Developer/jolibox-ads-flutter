@@ -20,6 +20,7 @@ Banner、插屏和激励视频广告，不包含真实的 `joliSource`、场景�
 1. 先按上级[接入文档](../README_CN.md)完成 Android 或 iOS 原生配置。
 2. 将 `qa.local.json.example` 复制为 `qa.local.json`，填写 `JOLIBOX_SCENE`。该本地
    文件已被 Git 忽略。
+   仅配置当前准备运行的平台对应的原生参数即可。
 3. 在已 Git 忽略的 `android/local.properties` 中追加原生配置：
 
    ```properties
@@ -45,9 +46,9 @@ Banner、插屏和激励视频广告，不包含真实的 `joliSource`、场景�
    flutter run --dart-define-from-file=qa.local.json
    ```
 
-`ExampleApplication.kt` 会经由 `BuildConfig` 读取 Android 参数，并在
-`FlutterActivity` 渲染前执行初始化；`AppDelegate.swift` 会在 Flutter 加载广告前读取
-iOS xcconfig 参数并初始化。`android/local.properties` 与
+`ExampleApplication.kt` 会经由 `BuildConfig` 在 `FlutterActivity` 渲染前发起 Android
+初始化，Flutter 控件会等待其结果；`AppDelegate.swift` 会在应用启动时发起 iOS 初始化，
+Flutter 控件会在加载广告前等待结果。`android/local.properties` 与
 `ios/Runner/Config/Jolibox.local.xcconfig` 均已被 Git 忽略。
 
 原生初始化成功后，Banner Widget 会自动请求广告。插屏和激励视频使用独立的 Load、Show
