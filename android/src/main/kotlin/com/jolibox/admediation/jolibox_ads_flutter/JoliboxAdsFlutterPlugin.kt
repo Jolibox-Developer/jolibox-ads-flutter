@@ -93,18 +93,15 @@ class JoliboxAdsFlutterPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, 
     }
 
     private fun initialize(arguments: Map<String, Any?>, result: MethodChannel.Result) {
+        val environment = mediationEnvironment(arguments.string("environment"))
+        if (environment == null) {
+            result.error("INVALID_ARGUMENT", "environment must be staging or production.", null)
+            return
+        }
         val context = applicationContext
         if (context == null) {
             result.error("ENGINE_DETACHED", "The Flutter engine is detached.", null)
             return
-        }
-        val environment = when (arguments.string("environment")) {
-            "staging" -> MediationEnvironment.STAGING
-            "production" -> MediationEnvironment.PRODUCTION
-            else -> {
-                result.error("INVALID_ARGUMENT", "environment must be staging or production.", null)
-                return
-            }
         }
         JoliboxAds.initialize(context, arguments.string("joliSource"), environment, object : InitializationCallback {
             override fun onInitialized() = result.success(null)
@@ -258,6 +255,12 @@ internal fun Any?.asStringMap(): Map<String, Any?> =
 
 internal fun Map<String, Any?>.string(key: String): String =
     (this[key] as? String).orEmpty().trim()
+
+internal fun mediationEnvironment(value: String): MediationEnvironment? = when (value.trim()) {
+    "staging" -> MediationEnvironment.STAGING
+    "production" -> MediationEnvironment.PRODUCTION
+    else -> null
+}
 
 internal fun MethodChannel.Result.fail(error: JoliboxAdError) {
     this.error(error.code.name, error.message, null)

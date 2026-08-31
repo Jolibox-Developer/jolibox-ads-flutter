@@ -8,7 +8,8 @@ AdMob Banner, Interstitial, and Rewarded ads on Android and iOS.
 ## Requirements
 
 - Flutter `3.22.3`
-- Android: `minSdk 23`, `compileSdk 35`, Java 17
+- Android: `minSdk 23`, `compileSdk 35`, Java 17, Kotlin `2.0.21`,
+  Android Gradle Plugin `8.6.1`, and Gradle `8.7`
 - iOS `13.0` or later
 - A released Jolibox Ad Mediation native SDK for each platform
 
@@ -23,8 +24,9 @@ ad state.
 [`example/`](example/) is a complete mixed Android/iOS host rather than a
 Flutter-only snippet. Its Android `Application` and iOS `AppDelegate` each
 initialize the native SDK, while its Flutter screen demonstrates the Banner
-Widget and the Interstitial/Rewarded `load → show` lifecycles. It contains only
-placeholders; local configuration files are ignored by Git. See the
+Widget and the Interstitial/Rewarded `load → show` lifecycles. It contains no
+host credentials: configuration values remain placeholders and AdMob App IDs
+are Google's official samples. Local configuration files are ignored by Git. See the
 [example guide](example/README.md) before running it.
 
 ## Add the package
@@ -36,7 +38,7 @@ dependencies:
   jolibox_ads_flutter:
     git:
       url: https://github.com/Jolibox-Developer/jolibox-ads-flutter.git
-      ref: 0.6.3
+      ref: 0.6.4
 ```
 
 Run `flutter pub get` after updating `pubspec.yaml`.
@@ -46,21 +48,50 @@ Run `flutter pub get` after updating `pubspec.yaml`.
 ### Android
 
 Add the matching binary Maven repository to the host application's Gradle
-repositories. The Flutter plugin resolves the native mediation artifact
-transitively; do not add a second copy of the native SDK to the same application
-target.
+repositories. For a Flutter `3.22.3` project, put it in the existing
+`allprojects.repositories` block in the host's `android/build.gradle`:
 
 ```gradle
-repositories {
-  google()
-  mavenCentral()
-  maven { url = uri("https://raw.githubusercontent.com/Jolibox-Developer/jolibox-ad-mediation-android-maven/0.6.1/") }
+allprojects {
+  repositories {
+    google()
+    mavenCentral()
+    maven { url = uri("https://raw.githubusercontent.com/Jolibox-Developer/jolibox-ad-mediation-android-maven/0.6.2/") }
+  }
 }
 ```
 
-The Flutter bridge uses `com.jolibox.android:jolibox-ad-mediation:0.6.1`,
+If the host already centralizes repositories with
+`dependencyResolutionManagement`, add the same three repository entries to the
+existing `repositories` block in `android/settings.gradle` instead. Do not add
+the repository in both places when the host enforces settings-level repositories.
+
+```gradle
+dependencyResolutionManagement {
+  repositories {
+    google()
+    mavenCentral()
+    maven { url = uri("https://raw.githubusercontent.com/Jolibox-Developer/jolibox-ad-mediation-android-maven/0.6.2/") }
+  }
+}
+```
+
+The Flutter bridge uses `com.jolibox.android:jolibox-ad-mediation:0.6.2`,
 which transitively resolves Google Mobile Ads `24.0.0`. The Android NDK is not
-required merely to consume the released AAR.
+required merely to consume the released AAR. The host adds only the Maven
+repository: do **not** manually add another
+`implementation("com.jolibox.android:jolibox-ad-mediation:...")` dependency,
+and do not edit this Flutter plugin's own `android/build.gradle`.
+
+Add the host's AdMob App ID inside the `<application>` element of
+`android/app/src/main/AndroidManifest.xml`. This is an App ID containing `~`,
+not an ad unit ID containing `/`.
+
+```xml
+<meta-data
+    android:name="com.google.android.gms.ads.APPLICATION_ID"
+    android:value="YOUR_ANDROID_ADMOB_APP_ID" />
+```
 
 Initialize the native SDK once from the Android application startup path. The
 exact configuration value is provided separately for your integration. When
@@ -86,13 +117,13 @@ class HostApplication : Application() {
 
 ### iOS
 
-Flutter bridge `0.6.3` requires Flutter `3.22.3` and uses CocoaPods for iOS
-delivery. It bundles the matching native mediation `0.6.1`
-artifact; keep the Android Maven repository at `0.6.1` unless a later native
-SDK release is supplied. The Flutter Swift Package Manager integration
+Flutter bridge `0.6.4` requires Flutter `3.22.3` and uses CocoaPods for iOS
+delivery. It bundles native mediation `0.6.1` and resolves
+Google Mobile Ads SDK `12.1.0`. Keep the Android Maven repository at `0.6.2`
+unless a later native SDK release is supplied. The Flutter Swift Package Manager integration
 documented for earlier releases is not supported by this release. An existing
-iOS host must migrate to the CocoaPods steps below; if CocoaPods cannot be used, it cannot integrate
-`0.6.3`.
+iOS host must migrate to the CocoaPods steps below; if CocoaPods cannot be used,
+it cannot integrate `0.6.4`.
 
 The plugin links its bundled native XCFramework through CocoaPods. From the
 Flutter application root, run:
@@ -104,7 +135,14 @@ cd ios && pod install && cd ..
 
 Do not also add `JoliboxAdMediation` through Swift Package Manager to the same
 iOS application target; the Flutter plugin already bundles the matching
-framework. Initialize the native SDK once from the iOS application startup
+framework. Add the host's AdMob App ID to `ios/Runner/Info.plist`:
+
+```xml
+<key>GADApplicationIdentifier</key>
+<string>YOUR_IOS_ADMOB_APP_ID</string>
+```
+
+Initialize the native SDK once from the iOS application startup
 path, in `AppDelegate.application(_:didFinishLaunchingWithOptions:)`, before
 Flutter loads any ads.
 
@@ -165,6 +203,20 @@ For a rewarded ad, use `JoliboxRewardedAd.load` and pass
 `onUserEarnedReward` to `show`. The reward callback has no amount or type
 payload.
 
+## Migrating from 0.4.x
+
+The legacy static fullscreen API is not available in `0.6.4`. Replace
+`JoliboxAdsFlutter.loadInterstitial(...)`,
+`JoliboxAdsFlutter.loadRewarded(...)`, `JoliboxAdsFlutter.show(...)`,
+`JoliboxAdsFlutter.disposeAd(...)`, and `JoliboxFullscreenAd` with the
+object-style `JoliboxInterstitialAd` and `JoliboxRewardedAd` APIs shown above.
+Set `fullScreenContentCallback` on the loaded object, call its `show()` once,
+and call its `dispose()` only when a loaded ad will not be shown.
+
+iOS hosts migrating from the old Flutter Swift Package Manager instructions
+must remove that package from the application target and run CocoaPods as
+described in the iOS setup section.
+
 ## Optional Flutter initialization
 
 Use this only when the host deliberately delegates its first native
@@ -190,5 +242,11 @@ All public `PlatformException.code` values use the `ADS_` prefix. Established
 ad errors include `ADS_LOAD_FAILED`, `ADS_SHOW_FAILED`,
 `ADS_AD_NOT_FOUND`, `ADS_ACTIVITY_REQUIRED`, and `ADS_SHOW_IN_PROGRESS`.
 Initialization and configuration errors use the same `ADS_` prefix.
+An empty or whitespace-only `scene` is a caller error and completes the Dart
+load future with `ArgumentError` before any native request is made.
+`ADS_ACTIVITY_REQUIRED` and `ADS_SHOW_IN_PROGRESS` are retryable: wait until an
+active presenter is available or the current fullscreen ad finishes, then call
+`show()` again on the same loaded object. Other show failures are terminal; load
+a new ad object before retrying.
 
 For a Chinese version, see [README_CN.md](README_CN.md).

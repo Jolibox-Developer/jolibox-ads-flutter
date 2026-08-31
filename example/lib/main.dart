@@ -115,6 +115,12 @@ class _JoliboxAdsExamplePageState extends State<JoliboxAdsExamplePage> {
     try {
       await ad.show();
     } catch (error) {
+      if (!_isRetryableShowError(error)) {
+        if (mounted && identical(_interstitialAd, ad)) {
+          setState(() => _interstitialAd = null);
+        }
+        await ad.dispose();
+      }
       _setStatus('Interstitial show failed: $error');
     }
   }
@@ -169,6 +175,12 @@ class _JoliboxAdsExamplePageState extends State<JoliboxAdsExamplePage> {
         onUserEarnedReward: () => _setStatus('Rewarded ad reward callback.'),
       );
     } catch (error) {
+      if (!_isRetryableShowError(error)) {
+        if (mounted && identical(_rewardedAd, ad)) {
+          setState(() => _rewardedAd = null);
+        }
+        await ad.dispose();
+      }
       _setStatus('Rewarded show failed: $error');
     }
   }
@@ -282,6 +294,11 @@ class _JoliboxAdsExamplePageState extends State<JoliboxAdsExamplePage> {
     );
   }
 }
+
+bool _isRetryableShowError(Object error) =>
+    error is PlatformException &&
+    (error.code == 'ADS_ACTIVITY_REQUIRED' ||
+        error.code == 'ADS_SHOW_IN_PROGRESS');
 
 String _bannerSizeLabel(JoliboxBannerSize size) => switch (size) {
       JoliboxBannerSize.banner => 'Banner (320 x 50)',

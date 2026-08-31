@@ -2,6 +2,16 @@
 
 > 中文说明：[CHANGELOG_CN.md](CHANGELOG_CN.md)
 
+## 0.6.4
+
+- Uses Kotlin `2.0.21`, Android Gradle Plugin `8.6.1`, and Gradle `8.7` while retaining `compileSdk 35` and Java 17.
+- Updates the Android native mediation dependency to Kotlin `2.0.21` compatible release `0.6.2`.
+- Documents host Maven placement, required AdMob App IDs, iOS Google Mobile Ads `12.1.0`, and the `0.4.x` API migration.
+- Prevents host `onAdLoaded` exceptions from being reported as native ad load failures.
+- Treats terminal fullscreen show failures consistently and does not recache consumed iOS ads.
+- Keeps an ad retryable when another fullscreen ad is already showing.
+- Replaces the generated Android plugin test with bridge behavior tests and expands Dart lifecycle coverage.
+
 ## 0.6.3
 
 - Aligns Flutter package, Android Gradle plugin, and CocoaPods metadata at `0.6.3`.

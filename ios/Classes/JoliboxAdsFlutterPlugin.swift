@@ -151,7 +151,7 @@ public final class JoliboxAdsFlutterPlugin: NSObject, @preconcurrency FlutterPlu
             try ad.show(from: presenter)
         } catch {
             showing = nil
-            ads[id] = ad
+            ad.invalidate()
             result(self.error(error))
         }
     }

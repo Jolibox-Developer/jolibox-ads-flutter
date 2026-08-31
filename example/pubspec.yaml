@@ -1,12 +1,13 @@
 name: jolibox_ads_flutter_example
 description: "Demonstrates how to use the jolibox_ads_flutter plugin."
-version: 0.6.3+1
+version: 0.6.4+1
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 environment:
   sdk: '>=3.4.4 <4.0.0'
+  flutter: '3.22.3'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -19,11 +20,12 @@ dependencies:
     sdk: flutter
 
   jolibox_ads_flutter:
-    # When depending on this package from a real application you should use:
-    #   jolibox_ads_flutter: ^x.y.z
-    # See https://dart.dev/tools/pub/dependencies#version-constraints
-    # The example app is bundled with the plugin so we use a path dependency on
-    # the parent directory to use the current plugin's version.
+    # This repository's bundled example uses the parent package directly.
+    # A real host application should use the released Git tag instead:
+    #   jolibox_ads_flutter:
+    #     git:
+    #       url: https://github.com/Jolibox-Developer/jolibox-ads-flutter.git
+    #       ref: 0.6.4
     path: ../
 
   # The following adds the Cupertino Icons font to your application.

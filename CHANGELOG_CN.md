@@ -2,6 +2,16 @@
 
 > English documentation: [CHANGELOG.md](CHANGELOG.md)
 
+## 0.6.4
+
+- Android 调整为 Kotlin `2.0.21`、Android Gradle Plugin `8.6.1`、Gradle `8.7`，保持 `compileSdk 35` 与 Java 17。
+- Android 原生聚合依赖升级至兼容 Kotlin `2.0.21` 的 `0.6.2`。
+- 补充宿主 Maven 配置位置、必需的 AdMob App ID、iOS Google Mobile Ads `12.1.0` 以及从 `0.4.x` 迁移 API 的说明。
+- 宿主 `onAdLoaded` 自身抛出的异常不再被误报为原生广告加载失败。
+- 统一全屏广告终态展示失败处理，并避免 iOS 重新缓存已消费广告。
+- 另一个全屏广告正在展示时，当前广告仍保持可重试状态。
+- 删除无效的 Android 模板测试，改为真实桥接行为测试，并扩充 Dart 生命周期覆盖。
+
 ## 0.6.3
 
 - 将 Flutter 包、Android Gradle 插件和 CocoaPods 元数据统一为 `0.6.3`。

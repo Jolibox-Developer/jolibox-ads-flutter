@@ -4,6 +4,11 @@ This is a runnable mixed Android/iOS host example, not a Flutter-only snippet.
 It covers Banner, Interstitial, and Rewarded ads. It does not contain a real
 `joliSource`, scene, ad unit ID, or other environment credential.
 
+The checked-in Android manifest and iOS plist use Google's official sample
+AdMob App IDs so the example is safe to run during development. A production
+host must replace them with its own App IDs in
+`android/app/src/main/AndroidManifest.xml` and `ios/Runner/Info.plist`.
+
 ## What it demonstrates
 
 1. Android initializes `JoliboxAds` from `ExampleApplication.onCreate()`.

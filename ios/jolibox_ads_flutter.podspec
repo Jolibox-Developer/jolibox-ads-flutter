@@ -4,13 +4,13 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'jolibox_ads_flutter'
-  s.version          = '0.6.3'
+  s.version          = '0.6.4'
   s.summary          = 'Flutter bridge for Jolibox Ad Mediation.'
   s.description      = <<-DESC
 Flutter bridge for the Jolibox native ad mediation SDK.
                        DESC
   s.homepage         = 'https://github.com/Jolibox-Developer/jolibox-ads-flutter'
-  s.license          = { :file => '../LICENSE' }
+  s.license          = { :type => 'Proprietary', :file => '../LICENSE' }
   s.author           = 'Jolibox'
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'

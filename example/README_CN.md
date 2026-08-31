@@ -3,6 +3,10 @@
 这是可运行的 Android/iOS 混编宿主示例，不是只包含 Flutter 调用的代码片段。它覆盖
 Banner、插屏和激励视频广告，不包含真实的 `joliSource`、场景值、广告位 ID 或其他环境凭据。
 
+仓库中的 Android Manifest 与 iOS plist 使用 Google 官方示例 AdMob App ID，可安全用于
+开发测试。生产宿主必须在 `android/app/src/main/AndroidManifest.xml` 和
+`ios/Runner/Info.plist` 中替换为自己的 App ID。
+
 ## 示例内容
 
 1. Android 在 `ExampleApplication.onCreate()` 中初始化 `JoliboxAds`。

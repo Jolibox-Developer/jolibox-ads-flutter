@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
@@ -40,31 +40,38 @@ class JoliboxAdsFlutter {
   ) async {
     _ensureSupportedPlatform();
     _ensureEventHandler();
+    final normalizedScene = _requireScene(scene);
+    late final String id;
     try {
-      final id = await _channel.invokeMethod<String>(method, {
-        'scene': _requireScene(scene),
+      final loadedId = await _channel.invokeMethod<String>(method, {
+        'scene': normalizedScene,
       });
-      if (id == null || id.isEmpty) {
+      if (loadedId == null || loadedId.isEmpty) {
         throw PlatformException(
           code: 'ADS_LOAD_FAILED',
           message: 'The native SDK did not return a loaded ad.',
         );
       }
-      onLoaded(id);
+      id = loadedId;
     } on PlatformException catch (error) {
       onFailedToLoad(_publicError(error));
+      return;
     } catch (error) {
       onFailedToLoad(
         PlatformException(code: 'ADS_LOAD_FAILED', message: '$error'),
       );
+      return;
     }
+    onLoaded(id);
   }
 
   static Future<void> _showObject(_JoliboxObjectAd ad) async {
     _ensureSupportedPlatform();
     if (_showingAdId != null) {
-      throw StateError(
-        'A fullscreen ad is already showing. Wait for it to finish first.',
+      throw PlatformException(
+        code: 'ADS_SHOW_IN_PROGRESS',
+        message:
+            'A fullscreen ad is already showing. Wait for it to finish first.',
       );
     }
     _showingAdId = ad.id;
@@ -129,7 +136,9 @@ class JoliboxAdsFlutter {
   }
 
   static void _ensureSupportedPlatform() {
-    if (!Platform.isAndroid && !Platform.isIOS) {
+    if (kIsWeb ||
+        (defaultTargetPlatform != TargetPlatform.android &&
+            defaultTargetPlatform != TargetPlatform.iOS)) {
       throw UnsupportedError(
         'Jolibox Ads Flutter supports Android and iOS only.',
       );
@@ -239,8 +248,11 @@ abstract class _JoliboxObjectAd {
         break;
       case 'onAdDismissedFullScreenContent':
         _state = _AdState.terminal;
-        _fullScreenContentCallback?.onAdDismissedFullScreenContent?.call();
-        unawaited(_releaseTerminal());
+        try {
+          _fullScreenContentCallback?.onAdDismissedFullScreenContent?.call();
+        } finally {
+          unawaited(_releaseTerminal());
+        }
         break;
       case 'onAdFailedToShowFullScreenContent':
         _state = _AdState.terminal;
@@ -248,10 +260,13 @@ abstract class _JoliboxObjectAd {
           code: arguments?['code'] as String? ?? 'ADS_SHOW_FAILED',
           message: arguments?['message'] as String?,
         );
-        _fullScreenContentCallback?.onAdFailedToShowFullScreenContent?.call(
-          JoliboxAdsFlutter._publicError(error),
-        );
-        unawaited(_releaseTerminal());
+        try {
+          _fullScreenContentCallback?.onAdFailedToShowFullScreenContent?.call(
+            JoliboxAdsFlutter._publicError(error),
+          );
+        } finally {
+          unawaited(_releaseTerminal());
+        }
         break;
     }
   }
@@ -273,7 +288,12 @@ class JoliboxInterstitialAd extends _JoliboxObjectAd {
     return JoliboxAdsFlutter._loadObject('loadInterstitial', scene, (id) {
       final ad = JoliboxInterstitialAd._(id);
       JoliboxAdsFlutter._fullscreenAds[id] = ad;
-      adLoadCallback.onAdLoaded(ad);
+      try {
+        adLoadCallback.onAdLoaded(ad);
+      } catch (_) {
+        unawaited(ad.dispose());
+        rethrow;
+      }
     }, adLoadCallback.onAdFailedToLoad);
   }
 
@@ -290,7 +310,12 @@ class JoliboxRewardedAd extends _JoliboxObjectAd {
     return JoliboxAdsFlutter._loadObject('loadRewarded', scene, (id) {
       final ad = JoliboxRewardedAd._(id);
       JoliboxAdsFlutter._fullscreenAds[id] = ad;
-      adLoadCallback.onAdLoaded(ad);
+      try {
+        adLoadCallback.onAdLoaded(ad);
+      } catch (_) {
+        unawaited(ad.dispose());
+        rethrow;
+      }
     }, adLoadCallback.onAdFailedToLoad);
   }
 
@@ -361,7 +386,7 @@ class _JoliboxBannerAdState extends State<JoliboxBannerAd> {
     };
     return SizedBox(
       height: height,
-      child: Platform.isAndroid
+      child: defaultTargetPlatform == TargetPlatform.android
           ? AndroidView(
               key: ValueKey('${widget.scene}:${widget.size.name}'),
               viewType: 'jolibox_ads_flutter/banner',
@@ -388,7 +413,9 @@ class _JoliboxBannerAdState extends State<JoliboxBannerAd> {
     final channel = MethodChannel('jolibox_ads_flutter/banner/$id');
     _eventChannel = channel;
     channel.setMethodCallHandler((call) async {
-      if (!mounted || generation != _viewGeneration || _eventChannel != channel) {
+      if (!mounted ||
+          generation != _viewGeneration ||
+          _eventChannel != channel) {
         return;
       }
       final arguments = call.arguments as Map<Object?, Object?>?;
