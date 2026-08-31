@@ -41,7 +41,7 @@ dependencies:
   jolibox_ads_flutter:
     git:
       url: https://github.com/Jolibox-Developer/jolibox-ads-flutter.git
-      ref: 0.6.5
+      ref: 0.6.6
 ```
 
 Before resolving dependencies, run `flutter --version` and confirm that it
@@ -167,13 +167,13 @@ Declare that class on the host application element:
 
 ### iOS
 
-Flutter bridge `0.6.5` requires Flutter `3.22.3` and uses CocoaPods for iOS
+Flutter bridge `0.6.6` requires Flutter `3.22.3` and uses CocoaPods for iOS
 delivery. It bundles native mediation `0.6.1` and resolves
 Google Mobile Ads SDK `12.1.0`. Keep the Android Maven repository at `0.6.2`
 unless a later native SDK release is supplied. The Flutter Swift Package Manager integration
 documented for earlier releases is not supported by this release. An existing
 iOS host must migrate to the CocoaPods steps below; if CocoaPods cannot be used,
-it cannot integrate `0.6.5`.
+it cannot integrate `0.6.6`.
 
 The plugin links its bundled native XCFramework through CocoaPods. From the
 Flutter application root, run:
@@ -184,7 +184,7 @@ cd ios && pod install && cd ..
 ```
 
 After `pod install`, inspect `ios/Podfile.lock`. It must resolve
-`jolibox_ads_flutter (0.6.5)` and `Google-Mobile-Ads-SDK (12.1.0)`. Do not delete
+`jolibox_ads_flutter (0.6.6)` and `Google-Mobile-Ads-SDK (12.1.0)`. Do not delete
 an existing lockfile merely to change versions; if either value differs, first
 check the selected Flutter package ref and the host's Pod dependency
 constraints.
@@ -337,20 +337,6 @@ The snippet requires `package:flutter/services.dart` for `PlatformException`.
 For a rewarded ad, use `JoliboxRewardedAd.load` and pass
 `onUserEarnedReward` to `show`. The reward callback has no amount or type
 payload.
-
-## Migrating from 0.4.x
-
-Starting with `0.6.4`, the legacy static fullscreen API is not available. Replace
-`JoliboxAdsFlutter.loadInterstitial(...)`,
-`JoliboxAdsFlutter.loadRewarded(...)`, `JoliboxAdsFlutter.show(...)`,
-`JoliboxAdsFlutter.disposeAd(...)`, and `JoliboxFullscreenAd` with the
-object-style `JoliboxInterstitialAd` and `JoliboxRewardedAd` APIs shown above.
-Set `fullScreenContentCallback` on the loaded object, call its `show()` once,
-and call its `dispose()` only when a loaded ad will not be shown.
-
-iOS hosts migrating from the old Flutter Swift Package Manager instructions
-must remove that package from the application target and run CocoaPods as
-described in the iOS setup section.
 
 ## Errors and callbacks
 

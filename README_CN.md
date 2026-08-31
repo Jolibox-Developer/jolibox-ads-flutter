@@ -37,7 +37,7 @@ dependencies:
   jolibox_ads_flutter:
     git:
       url: https://github.com/Jolibox-Developer/jolibox-ads-flutter.git
-      ref: 0.6.5
+      ref: 0.6.6
 ```
 
 解析依赖前先执行 `flutter --version`，确认输出严格为 `3.22.3`，再执行
@@ -153,11 +153,11 @@ class HostApplication : Application() {
 
 ### iOS
 
-Flutter 桥接 `0.6.5` 固定要求 Flutter `3.22.3`，iOS 制品仅通过 CocoaPods 交付，
+Flutter 桥接 `0.6.6` 固定要求 Flutter `3.22.3`，iOS 制品仅通过 CocoaPods 交付，
 内置原生聚合 SDK `0.6.1`，并解析 Google Mobile Ads SDK `12.1.0`；除非后续提供新的
 原生 SDK，否则 Android Maven 仓库仍使用 `0.6.2`。旧版本文档中基于 Flutter Swift Package Manager 的接入方式
 不支持用于本版本。已有 iOS 宿主必须迁移到下方的 CocoaPods 步骤；若无法使用
-CocoaPods，则无法接入 `0.6.5`。
+CocoaPods，则无法接入 `0.6.6`。
 
 插件通过 CocoaPods 链接随包提供的原生 XCFramework。在 Flutter 应用根目录执行：
 
@@ -167,7 +167,7 @@ cd ios && pod install && cd ..
 ```
 
 `pod install` 完成后检查 `ios/Podfile.lock`，其中必须解析为
-`jolibox_ads_flutter (0.6.5)` 与 `Google-Mobile-Ads-SDK (12.1.0)`。不要仅为改变版本而
+`jolibox_ads_flutter (0.6.6)` 与 `Google-Mobile-Ads-SDK (12.1.0)`。不要仅为改变版本而
 删除现有 lockfile；若任一版本不符，应先检查 Flutter 依赖选择的 Tag 和宿主 Pod
 版本约束。
 
@@ -315,19 +315,6 @@ JoliboxInterstitialAd.load(
 
 激励视频使用 `JoliboxRewardedAd.load`，并在 `show` 中传入
 `onUserEarnedReward`。奖励回调不包含金额或类型。
-
-## 从 0.4.x 迁移
-
-从 `0.6.4` 开始不再提供旧版静态全屏广告 API。请将
-`JoliboxAdsFlutter.loadInterstitial(...)`、
-`JoliboxAdsFlutter.loadRewarded(...)`、`JoliboxAdsFlutter.show(...)`、
-`JoliboxAdsFlutter.disposeAd(...)` 和 `JoliboxFullscreenAd` 替换为上文所示的
-`JoliboxInterstitialAd`、`JoliboxRewardedAd` 对象式 API。加载成功后在广告对象上设置
-`fullScreenContentCallback`，每个对象只调用一次 `show()`；仅当已加载广告不再展示时
-调用其 `dispose()`。
-
-iOS 宿主若曾使用旧版 Flutter Swift Package Manager 接入，需要从 application target
-删除该依赖，并按 iOS 配置章节改用 CocoaPods。
 
 ## 错误与回调
 
