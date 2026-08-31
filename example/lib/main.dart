@@ -201,7 +201,7 @@ class _JoliboxAdsExamplePageState extends State<JoliboxAdsExamplePage> {
             const SizedBox(height: 24),
             Text('Banner', style: Theme.of(context).textTheme.titleLarge),
             DropdownButtonFormField<JoliboxBannerSize>(
-              initialValue: _bannerSize,
+              value: _bannerSize,
               decoration: const InputDecoration(labelText: 'Banner size'),
               items: JoliboxBannerSize.values
                   .map(

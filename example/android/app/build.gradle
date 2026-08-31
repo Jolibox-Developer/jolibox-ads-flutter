@@ -67,10 +67,3 @@ android {
 flutter {
     source = "../.."
 }
-
-dependencies {
-    def localMediationAar = project.findProperty("joliboxMediationLocalAar")
-    if (localMediationAar != null) {
-        implementation(files(localMediationAar))
-    }
-}
