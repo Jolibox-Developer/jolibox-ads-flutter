@@ -38,8 +38,19 @@ check_joli_source_value() {
   fi
 }
 
+check_forbidden_internal_url() {
+  local matches
+  matches=$(/usr/bin/grep -E -i 'https?://[^[:space:]]*(settings|config|api)[^[:space:]]*' "${PUBLIC_PATHS[@]}" || true)
+  matches=$(printf '%s\n' "$matches" | /usr/bin/grep -F -v 'https://storage.googleapis.com/download.flutter.io' || true)
+
+  if [[ -n "$matches" ]]; then
+    echo "Public surface contains an internal configuration URL." >&2
+    exit 1
+  fi
+}
+
 check_forbidden 'ca-app-pub-'
-check_forbidden 'https?://[^[:space:]]*(settings|config|api)[^[:space:]]*'
+check_forbidden_internal_url
 check_joli_source_value
 check_forbidden 'joli[_-]sdk|jolibox[[:space:]_-]*sdk'
 

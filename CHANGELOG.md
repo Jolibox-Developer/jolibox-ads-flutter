@@ -2,10 +2,13 @@
 
 > 中文说明：[CHANGELOG_CN.md](CHANGELOG_CN.md)
 
-## Unreleased
+## 0.6.5
 
-- Removes plugin-level dependency repository declarations so a future release
-  can support hosts using `RepositoriesMode.FAIL_ON_PROJECT_REPOS`.
+- Removes Jolibox plugin-level dependency repository declarations so hosts can
+  centralize repositories with `RepositoriesMode.PREFER_SETTINGS`.
+- Documents that Flutter `3.22.3` itself is incompatible with
+  `RepositoriesMode.FAIL_ON_PROJECT_REPOS`, and adds the required Flutter Engine
+  Maven repository to the settings-level integration example.
 - Splits pure-Flutter and mixed-host initialization instructions, documents the
   verified toolchain baselines, and handles retryable fullscreen show errors in
   the integration examples.

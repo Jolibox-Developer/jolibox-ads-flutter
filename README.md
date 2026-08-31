@@ -41,7 +41,7 @@ dependencies:
   jolibox_ads_flutter:
     git:
       url: https://github.com/Jolibox-Developer/jolibox-ads-flutter.git
-      ref: 0.6.4
+      ref: 0.6.5
 ```
 
 Before resolving dependencies, run `flutter --version` and confirm that it
@@ -80,11 +80,10 @@ allprojects {
 ```
 
 If the host already centralizes repositories with
-`dependencyResolutionManagement`, add the same three repository entries to the
+`dependencyResolutionManagement`, use the following four repositories in the
 existing `repositories` block in `android/settings.gradle` instead. Do not add
-the repository in both places when the host enforces settings-level
-repositories. For the published `0.6.4` plugin, this form must prefer the
-settings repositories:
+the Jolibox repository in both places. With Flutter `3.22.3`, settings-level
+repository management must use `PREFER_SETTINGS`:
 
 ```gradle
 dependencyResolutionManagement {
@@ -92,17 +91,19 @@ dependencyResolutionManagement {
   repositories {
     google()
     mavenCentral()
+    maven { url = uri("https://storage.googleapis.com/download.flutter.io") }
     maven { url = uri("https://raw.githubusercontent.com/Jolibox-Developer/jolibox-ad-mediation-android-maven/0.6.2/") }
   }
 }
 ```
 
-The released `0.6.4` tag still declares project-level repositories inside the
-plugin. A `0.6.4` host must therefore use the `allprojects.repositories` form
-above, or settings-level repositories with
-`RepositoriesMode.PREFER_SETTINGS`. It is **not** compatible with
-`RepositoriesMode.FAIL_ON_PROJECT_REPOS`; support for that strict mode requires
-a later release containing the repository-declaration fix.
+Flutter `3.22.3`'s own Gradle plugin, and its `integration_test` plugin when
+used, declare project-level repositories. A host fixed to Flutter `3.22.3`
+therefore **must not** use `RepositoriesMode.FAIL_ON_PROJECT_REPOS`, regardless
+of the Jolibox plugin version. With `PREFER_SETTINGS`, Gradle may warn that
+those Flutter-owned project repositories were ignored; this is expected. The
+settings list above must retain both the Flutter Engine and Jolibox Maven
+repositories.
 
 The Flutter bridge uses `com.jolibox.android:jolibox-ad-mediation:0.6.2`,
 which transitively resolves Google Mobile Ads `24.0.0`. The Android NDK is not
@@ -166,13 +167,13 @@ Declare that class on the host application element:
 
 ### iOS
 
-Flutter bridge `0.6.4` requires Flutter `3.22.3` and uses CocoaPods for iOS
+Flutter bridge `0.6.5` requires Flutter `3.22.3` and uses CocoaPods for iOS
 delivery. It bundles native mediation `0.6.1` and resolves
 Google Mobile Ads SDK `12.1.0`. Keep the Android Maven repository at `0.6.2`
 unless a later native SDK release is supplied. The Flutter Swift Package Manager integration
 documented for earlier releases is not supported by this release. An existing
 iOS host must migrate to the CocoaPods steps below; if CocoaPods cannot be used,
-it cannot integrate `0.6.4`.
+it cannot integrate `0.6.5`.
 
 The plugin links its bundled native XCFramework through CocoaPods. From the
 Flutter application root, run:
@@ -183,7 +184,7 @@ cd ios && pod install && cd ..
 ```
 
 After `pod install`, inspect `ios/Podfile.lock`. It must resolve
-`jolibox_ads_flutter (0.6.4)` and `Google-Mobile-Ads-SDK (12.1.0)`. Do not delete
+`jolibox_ads_flutter (0.6.5)` and `Google-Mobile-Ads-SDK (12.1.0)`. Do not delete
 an existing lockfile merely to change versions; if either value differs, first
 check the selected Flutter package ref and the host's Pod dependency
 constraints.
@@ -339,7 +340,7 @@ payload.
 
 ## Migrating from 0.4.x
 
-The legacy static fullscreen API is not available in `0.6.4`. Replace
+Starting with `0.6.4`, the legacy static fullscreen API is not available. Replace
 `JoliboxAdsFlutter.loadInterstitial(...)`,
 `JoliboxAdsFlutter.loadRewarded(...)`, `JoliboxAdsFlutter.show(...)`,
 `JoliboxAdsFlutter.disposeAd(...)`, and `JoliboxFullscreenAd` with the

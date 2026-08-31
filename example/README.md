@@ -9,6 +9,12 @@ A pure Flutter host should use the Dart initialization mode documented in the
 parent integration guide and should not copy this example's private readiness
 channel.
 
+The Android host centralizes dependency repositories with
+`RepositoriesMode.PREFER_SETTINGS`. Flutter `3.22.3` may warn that its own
+plugins attempted to add project-level repositories; those repositories are
+ignored in favor of the complete settings-level list. Do not change this
+example to `FAIL_ON_PROJECT_REPOS`, which Flutter `3.22.3` does not support.
+
 The checked-in Android manifest and iOS plist use Google's official sample
 AdMob App IDs so the example is safe to run during development. A production
 host must replace them with its own App IDs in

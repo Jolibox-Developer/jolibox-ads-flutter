@@ -1,11 +1,3 @@
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-        maven { url = uri("https://raw.githubusercontent.com/Jolibox-Developer/jolibox-ad-mediation-android-maven/0.6.2/") }
-    }
-}
-
 rootProject.buildDir = "../build"
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"

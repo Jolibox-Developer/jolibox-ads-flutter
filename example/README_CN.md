@@ -6,6 +6,11 @@ Banner、插屏和激励视频广告，不包含真实的 `joliSource`、场景�
 本 Example 刻意使用原生/Flutter 混编初始化模式。纯 Flutter 宿主应使用上级接入文档中的
 Dart 初始化模式，不应复制 Example 的私有就绪状态 Channel。
 
+Android 宿主通过 `RepositoriesMode.PREFER_SETTINGS` 集中管理依赖仓库。Flutter
+`3.22.3` 可能提示其自带插件尝试添加项目级仓库；这些仓库会被忽略，并使用 settings 中的
+完整仓库列表。不要把 Example 改成 Flutter `3.22.3` 不支持的
+`FAIL_ON_PROJECT_REPOS`。
+
 仓库中的 Android Manifest 与 iOS plist 使用 Google 官方示例 AdMob App ID，可安全用于
 开发测试。生产宿主必须在 `android/app/src/main/AndroidManifest.xml` 和
 `ios/Runner/Info.plist` 中替换为自己的 App ID。

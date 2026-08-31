@@ -2,10 +2,12 @@
 
 > English documentation: [CHANGELOG.md](CHANGELOG.md)
 
-## 未发布
+## 0.6.5
 
-- 移除插件级依赖仓库声明，使后续版本可以支持使用
-  `RepositoriesMode.FAIL_ON_PROJECT_REPOS` 的宿主。
+- 移除 Jolibox 插件级依赖仓库声明，使宿主可以通过
+  `RepositoriesMode.PREFER_SETTINGS` 集中管理仓库。
+- 明确 Flutter `3.22.3` 自身不兼容 `RepositoriesMode.FAIL_ON_PROJECT_REPOS`，并在
+  settings 级接入示例中补充必需的 Flutter Engine Maven 仓库。
 - 区分纯 Flutter 与混编宿主初始化方式，补充已验收工具链基线，并在接入示例中处理可重试的
   全屏展示错误。
 

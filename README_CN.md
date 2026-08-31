@@ -37,7 +37,7 @@ dependencies:
   jolibox_ads_flutter:
     git:
       url: https://github.com/Jolibox-Developer/jolibox-ads-flutter.git
-      ref: 0.6.4
+      ref: 0.6.5
 ```
 
 解析依赖前先执行 `flutter --version`，确认输出严格为 `3.22.3`，再执行
@@ -74,9 +74,9 @@ allprojects {
 ```
 
 若宿主已经通过 `dependencyResolutionManagement` 集中管理仓库，则改为在
-`android/settings.gradle` 已有的 `repositories` 中加入相同的三个仓库。宿主若强制
-使用 settings 级仓库，不要在两个位置重复配置。对于已发布的 `0.6.4` 插件，此方式必须
-优先使用 settings 级仓库：
+`android/settings.gradle` 已有的 `repositories` 中配置以下四个仓库，不要同时在两个
+位置重复配置 Jolibox 仓库。Flutter `3.22.3` 的 settings 级仓库管理必须使用
+`PREFER_SETTINGS`：
 
 ```gradle
 dependencyResolutionManagement {
@@ -84,15 +84,17 @@ dependencyResolutionManagement {
   repositories {
     google()
     mavenCentral()
+    maven { url = uri("https://storage.googleapis.com/download.flutter.io") }
     maven { url = uri("https://raw.githubusercontent.com/Jolibox-Developer/jolibox-ad-mediation-android-maven/0.6.2/") }
   }
 }
 ```
 
-已发布的 `0.6.4` Tag 仍在插件内声明项目级仓库。因此 `0.6.4` 宿主应使用上面的
-`allprojects.repositories` 方式，或配合 `RepositoriesMode.PREFER_SETTINGS` 使用
-settings 级仓库；它**不兼容** `RepositoriesMode.FAIL_ON_PROJECT_REPOS`。严格模式支持
-必须等待包含仓库声明修复的后续版本。
+Flutter `3.22.3` 自带的 Gradle 插件，以及使用时的 `integration_test` 插件，都会声明
+项目级仓库。因此固定 Flutter `3.22.3` 的宿主无论使用哪个 Jolibox 插件版本，都**不得**
+使用 `RepositoriesMode.FAIL_ON_PROJECT_REPOS`。使用 `PREFER_SETTINGS` 时，Gradle 可能
+提示 Flutter 自有项目级仓库已被忽略，这是预期警告；上面的 settings 列表必须同时保留
+Flutter Engine 与 Jolibox Maven 仓库。
 
 Flutter 桥接依赖 `com.jolibox.android:jolibox-ad-mediation:0.6.2`，并会传递
 解析 Google Mobile Ads `24.0.0`。仅消费发布的 AAR 不需要安装 Android NDK。
@@ -151,11 +153,11 @@ class HostApplication : Application() {
 
 ### iOS
 
-Flutter 桥接 `0.6.4` 固定要求 Flutter `3.22.3`，iOS 制品仅通过 CocoaPods 交付，
+Flutter 桥接 `0.6.5` 固定要求 Flutter `3.22.3`，iOS 制品仅通过 CocoaPods 交付，
 内置原生聚合 SDK `0.6.1`，并解析 Google Mobile Ads SDK `12.1.0`；除非后续提供新的
 原生 SDK，否则 Android Maven 仓库仍使用 `0.6.2`。旧版本文档中基于 Flutter Swift Package Manager 的接入方式
 不支持用于本版本。已有 iOS 宿主必须迁移到下方的 CocoaPods 步骤；若无法使用
-CocoaPods，则无法接入 `0.6.4`。
+CocoaPods，则无法接入 `0.6.5`。
 
 插件通过 CocoaPods 链接随包提供的原生 XCFramework。在 Flutter 应用根目录执行：
 
@@ -165,7 +167,7 @@ cd ios && pod install && cd ..
 ```
 
 `pod install` 完成后检查 `ios/Podfile.lock`，其中必须解析为
-`jolibox_ads_flutter (0.6.4)` 与 `Google-Mobile-Ads-SDK (12.1.0)`。不要仅为改变版本而
+`jolibox_ads_flutter (0.6.5)` 与 `Google-Mobile-Ads-SDK (12.1.0)`。不要仅为改变版本而
 删除现有 lockfile；若任一版本不符，应先检查 Flutter 依赖选择的 Tag 和宿主 Pod
 版本约束。
 
@@ -316,7 +318,7 @@ JoliboxInterstitialAd.load(
 
 ## 从 0.4.x 迁移
 
-`0.6.4` 不再提供旧版静态全屏广告 API。请将
+从 `0.6.4` 开始不再提供旧版静态全屏广告 API。请将
 `JoliboxAdsFlutter.loadInterstitial(...)`、
 `JoliboxAdsFlutter.loadRewarded(...)`、`JoliboxAdsFlutter.show(...)`、
 `JoliboxAdsFlutter.disposeAd(...)` 和 `JoliboxFullscreenAd` 替换为上文所示的
