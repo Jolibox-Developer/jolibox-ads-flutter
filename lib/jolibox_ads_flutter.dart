@@ -6,9 +6,9 @@ import 'package:flutter/widgets.dart';
 
 /// Flutter bridge for the Jolibox native ad mediation SDK.
 ///
-/// Initialize the native Android or iOS SDK from the host application first.
-/// [initialize] is available only for hosts that need Flutter to delegate that
-/// same native initialization; it does not create a second SDK state.
+/// Initialize exactly once: either initialize from the native host and gate
+/// Flutter ad UI on that result, or call [initialize] from Dart before creating
+/// ad widgets or loading fullscreen ads. Do not combine both modes.
 class JoliboxAdsFlutter {
   JoliboxAdsFlutter._();
 

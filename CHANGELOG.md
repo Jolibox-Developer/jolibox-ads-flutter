@@ -2,6 +2,14 @@
 
 > 中文说明：[CHANGELOG_CN.md](CHANGELOG_CN.md)
 
+## Unreleased
+
+- Removes plugin-level dependency repository declarations so a future release
+  can support hosts using `RepositoriesMode.FAIL_ON_PROJECT_REPOS`.
+- Splits pure-Flutter and mixed-host initialization instructions, documents the
+  verified toolchain baselines, and handles retryable fullscreen show errors in
+  the integration examples.
+
 ## 0.6.4
 
 - Uses Kotlin `2.0.21`, Android Gradle Plugin `8.6.1`, and Gradle `8.7` while retaining `compileSdk 35` and Java 17.

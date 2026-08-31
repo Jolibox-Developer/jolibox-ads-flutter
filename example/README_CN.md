@@ -3,6 +3,9 @@
 这是可运行的 Android/iOS 混编宿主示例，不是只包含 Flutter 调用的代码片段。它覆盖
 Banner、插屏和激励视频广告，不包含真实的 `joliSource`、场景值、广告位 ID 或其他环境凭据。
 
+本 Example 刻意使用原生/Flutter 混编初始化模式。纯 Flutter 宿主应使用上级接入文档中的
+Dart 初始化模式，不应复制 Example 的私有就绪状态 Channel。
+
 仓库中的 Android Manifest 与 iOS plist 使用 Google 官方示例 AdMob App ID，可安全用于
 开发测试。生产宿主必须在 `android/app/src/main/AndroidManifest.xml` 和
 `ios/Runner/Info.plist` 中替换为自己的 App ID。
@@ -21,18 +24,19 @@ Banner、插屏和激励视频广告，不包含真实的 `joliSource`、场景�
 
 ## 运行方式
 
-1. 先按上级[接入文档](../README_CN.md)完成 Android 或 iOS 原生配置。
-2. 将 `qa.local.json.example` 复制为 `qa.local.json`，填写 `JOLIBOX_SCENE`。该本地
+1. 确认 `flutter --version` 输出的版本严格为 `3.22.3`。
+2. 先按上级[接入文档](../README_CN.md)完成 Android 或 iOS 原生配置。
+3. 将 `qa.local.json.example` 复制为 `qa.local.json`，填写 `JOLIBOX_SCENE`。该本地
    文件已被 Git 忽略。
    仅配置当前准备运行的平台对应的原生参数即可。
-3. 在已 Git 忽略的 `android/local.properties` 中追加原生配置：
+4. 在已 Git 忽略的 `android/local.properties` 中追加原生配置：
 
    ```properties
    jolibox.joliSource=YOUR_JOLI_SOURCE
    jolibox.environment=staging
    ```
 
-4. iOS 复制本地配置模板后，填写提供的参数：
+5. iOS 复制本地配置模板后，填写提供的参数：
 
    ```bash
    cp ios/Runner/Config/Jolibox.local.xcconfig.example \
@@ -44,7 +48,7 @@ Banner、插屏和激励视频广告，不包含真实的 `joliSource`、场景�
    JOLIBOX_ENVIRONMENT = staging
    ```
 
-5. 使用本地场景配置运行：
+6. 使用本地场景配置运行：
 
    ```bash
    flutter run --dart-define-from-file=qa.local.json

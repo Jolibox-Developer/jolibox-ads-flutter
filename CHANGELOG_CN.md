@@ -2,6 +2,13 @@
 
 > English documentation: [CHANGELOG.md](CHANGELOG.md)
 
+## 未发布
+
+- 移除插件级依赖仓库声明，使后续版本可以支持使用
+  `RepositoriesMode.FAIL_ON_PROJECT_REPOS` 的宿主。
+- 区分纯 Flutter 与混编宿主初始化方式，补充已验收工具链基线，并在接入示例中处理可重试的
+  全屏展示错误。
+
 ## 0.6.4
 
 - Android 调整为 Kotlin `2.0.21`、Android Gradle Plugin `8.6.1`、Gradle `8.7`，保持 `compileSdk 35` 与 Java 17。

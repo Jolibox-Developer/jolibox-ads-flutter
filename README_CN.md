@@ -8,14 +8,18 @@ Jolibox Ad Mediation 原生 SDK 的 Flutter 桥接，支持 Android 与 iOS 的
 ## 环境要求
 
 - Flutter `3.22.3`
-- Android：`minSdk 23`、`compileSdk 35`、Java 17、Kotlin `2.0.21`、
-  Android Gradle Plugin `8.6.1`、Gradle `8.7`
-- iOS `13.0` 及以上
+- Android：`minSdk 23`、Java 17、Kotlin `2.0.21`，且最终解析的 Google
+  Mobile Ads 版本为 `24.0.0`
+- iOS `13.0` 及以上，Google Mobile Ads SDK `12.1.0`
 - 已提供对应平台的 Jolibox Ad Mediation 原生 SDK 制品
 
-宿主应在应用启动阶段发起一次原生 SDK 初始化。Flutter 必须等待原生初始化结果后，
-再渲染 Banner 或加载全屏广告。Flutter 的可选初始化接口只会委托给同一份原生 SDK
-状态，不会创建第二份配置或广告状态。
+Android 已验收基线为 Android Gradle Plugin `8.6.1`、Gradle `8.7`、
+`compileSdk 35` 和 `targetSdk 35`。这些是验收值，不要求所有宿主照搬；宿主可以使用其他
+兼容的 AGP、Gradle、compile SDK 或 target SDK。本版本固定使用 Flutter `3.22.3` 与
+Kotlin `2.0.21`。
+
+iOS 已验收基线为 Xcode `26.4` 与 CocoaPods `1.17.0`。本版本不对其他 Xcode 或
+CocoaPods 版本作已验收承诺。
 
 ## 混编示例
 
@@ -36,11 +40,25 @@ dependencies:
       ref: 0.6.4
 ```
 
-更新 `pubspec.yaml` 后执行 `flutter pub get`。
+解析依赖前先执行 `flutter --version`，确认输出严格为 `3.22.3`，再执行
+`flutter pub get`。
 
 ## 原生配置
 
 ### Android
+
+将宿主已有的 Kotlin 版本声明精确设置为 `2.0.21`。使用 plugins DSL 的 Flutter 项目
+通常在 `android/settings.gradle` 中声明：
+
+```gradle
+plugins {
+  id "org.jetbrains.kotlin.android" version "2.0.21" apply false
+}
+```
+
+旧工程也可能在 `android/build.gradle` 中使用
+`ext.kotlin_version = "2.0.21"`。只更新宿主已有声明，不要重复添加第二份 Kotlin
+插件声明。
 
 在宿主应用的 Gradle 仓库中加入匹配的二进制 Maven 仓库。Flutter `3.22.3` 项目应将
 仓库配置放到宿主 `android/build.gradle` 已有的 `allprojects.repositories` 中：
@@ -57,10 +75,12 @@ allprojects {
 
 若宿主已经通过 `dependencyResolutionManagement` 集中管理仓库，则改为在
 `android/settings.gradle` 已有的 `repositories` 中加入相同的三个仓库。宿主若强制
-使用 settings 级仓库，不要在两个位置重复配置。
+使用 settings 级仓库，不要在两个位置重复配置。对于已发布的 `0.6.4` 插件，此方式必须
+优先使用 settings 级仓库：
 
 ```gradle
 dependencyResolutionManagement {
+  repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
   repositories {
     google()
     mavenCentral()
@@ -68,6 +88,11 @@ dependencyResolutionManagement {
   }
 }
 ```
+
+已发布的 `0.6.4` Tag 仍在插件内声明项目级仓库。因此 `0.6.4` 宿主应使用上面的
+`allprojects.repositories` 方式，或配合 `RepositoriesMode.PREFER_SETTINGS` 使用
+settings 级仓库；它**不兼容** `RepositoriesMode.FAIL_ON_PROJECT_REPOS`。严格模式支持
+必须等待包含仓库声明修复的后续版本。
 
 Flutter 桥接依赖 `com.jolibox.android:jolibox-ad-mediation:0.6.2`，并会传递
 解析 Google Mobile Ads `24.0.0`。仅消费发布的 AAR 不需要安装 Android NDK。
@@ -84,10 +109,17 @@ AdMob App ID。App ID 包含 `~`，不要误填包含 `/` 的广告位 ID。
     android:value="YOUR_ANDROID_ADMOB_APP_ID" />
 ```
 
-请在 Android 应用启动阶段完成一次原生初始化；若使用 `Application` 子类，需在宿主
-`AndroidManifest.xml` 的 `android:name` 中声明该类。
+原生/Flutter 混编宿主应在 Android 应用启动阶段完成一次原生初始化；若使用
+`Application` 子类，需在宿主 `AndroidManifest.xml` 的 `android:name` 中声明该类。
+纯 Flutter 宿主应跳过这段原生初始化，改用下文 Dart 初始化模式。
 
 ```kotlin
+import android.app.Application
+import com.jolibox.admediation.JoliboxAds
+import com.jolibox.admediation.api.InitializationCallback
+import com.jolibox.admediation.api.JoliboxAdError
+import com.jolibox.admediation.api.MediationEnvironment
+
 class HostApplication : Application() {
     override fun onCreate() {
         super.onCreate()
@@ -96,12 +128,25 @@ class HostApplication : Application() {
             "YOUR_JOLI_SOURCE",
             MediationEnvironment.STAGING,
             object : InitializationCallback {
-                override fun onInitialized() {}
-                override fun onInitializationFailed(error: JoliboxAdError) {}
+                override fun onInitialized() {
+                    // 通过宿主状态或宿主自有 MethodChannel 通知 Flutter 已就绪。
+                }
+
+                override fun onInitializationFailed(error: JoliboxAdError) {
+                    // 通知失败，并保持 Flutter 广告 UI 禁用。
+                }
             },
         )
     }
 }
+```
+
+同时在宿主 Manifest 的 application 元素声明该类：
+
+```xml
+<application
+    android:name=".HostApplication"
+    ...>
 ```
 
 ### iOS
@@ -119,6 +164,11 @@ flutter pub get
 cd ios && pod install && cd ..
 ```
 
+`pod install` 完成后检查 `ios/Podfile.lock`，其中必须解析为
+`jolibox_ads_flutter (0.6.4)` 与 `Google-Mobile-Ads-SDK (12.1.0)`。不要仅为改变版本而
+删除现有 lockfile；若任一版本不符，应先检查 Flutter 依赖选择的 Tag 和宿主 Pod
+版本约束。
+
 同一个 iOS application target 不应再通过 Swift Package Manager 引入
 `JoliboxAdMediation`；Flutter 插件已经内置匹配的 framework。在
 `ios/Runner/Info.plist` 中配置宿主自己的 AdMob App ID：
@@ -128,20 +178,85 @@ cd ios && pod install && cd ..
 <string>YOUR_IOS_ADMOB_APP_ID</string>
 ```
 
-请在 iOS 应用启动阶段发起一次原生初始化；初始化调用应放在
-`AppDelegate.application(_:didFinishLaunchingWithOptions:)` 中，且在
-Flutter 加载任何广告前执行。
+混编宿主应在 `AppDelegate.application(_:didFinishLaunchingWithOptions:)` 中完成一次
+原生初始化，将结果保存在宿主状态中，并在启用 Flutter 广告 UI 前把状态通知给 Flutter。
 
 ```swift
+import Flutter
 import JoliboxAdMediation
+import UIKit
 
-JoliboxAds.initialize(
-  joliSource: "YOUR_JOLI_SOURCE",
-  environment: .staging
-) { result in
-  // 在 Flutter 加载广告前处理初始化成功或失败。
+@UIApplicationMain
+@objc class AppDelegate: FlutterAppDelegate {
+  private(set) var adsReady = false
+
+  override func application(
+    _ application: UIApplication,
+    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+  ) -> Bool {
+    JoliboxAds.initialize(
+      joliSource: "YOUR_JOLI_SOURCE",
+      environment: .staging
+    ) { [weak self] result in
+      switch result {
+      case .success:
+        self?.adsReady = true
+        // 通知宿主的 Flutter 状态：广告 SDK 已就绪。
+      case .failure(let error):
+        self?.adsReady = false
+        // 上报 error.code，并保持 Flutter 广告 UI 禁用。
+      }
+    }
+
+    GeneratedPluginRegistrant.register(with: self)
+    return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+  }
 }
 ```
+
+Example 中的初始化 Channel 是这个就绪门禁的参考实现；它的 Channel 名属于示例宿主，
+不是 SDK 公共 API。
+
+## 选择一种初始化模式
+
+全程只初始化一次，不要同时使用下面两种模式。
+
+### 纯 Flutter 宿主
+
+完成上文 Maven/CocoaPods 与 AdMob App ID 配置后，在渲染任何广告 UI 前从 Dart 初始化：
+
+```dart
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  Object? initializationError;
+  try {
+    await JoliboxAdsFlutter.initialize(
+      // 从宿主批准的配置渠道获取该值，不要提交到仓库。
+      joliSource: suppliedConfiguration,
+      environment: JoliboxMediationEnvironment.staging,
+    );
+  } catch (error) {
+    initializationError = error;
+  }
+  runApp(HostApp(
+    adsEnabled: initializationError == null,
+    initializationError: initializationError,
+  ));
+}
+```
+
+上面的 `HostApp` 代表宿主自有 UI：`initializationError` 非空时，必须禁用所有广告
+Widget 与加载操作，也可以提供明确的重试入口。使用这种模式时，不要再在 Android
+`Application` 或 iOS `AppDelegate` 中重复初始化。
+
+### 原生/Flutter 混编宿主
+
+使用上文 Android/iOS 原生初始化方式。Flutter 必须消费宿主提供的 ready/failed 状态；
+在状态为 ready 前，不得创建 `JoliboxBannerAd`，也不得调用全屏广告 `load`。完整参考实现
+见 Example 的
+[Android Application](example/android/app/src/main/kotlin/com/jolibox/admediation/jolibox_ads_flutter_example/ExampleApplication.kt)、
+[iOS AppDelegate](example/ios/Runner/AppDelegate.swift) 与
+[Flutter 就绪门禁](example/lib/main.dart)。
 
 ## Banner Widget
 
@@ -178,12 +293,23 @@ JoliboxInterstitialAd.load(
         onAdDismissedFullScreenContent: () {},
         onAdFailedToShowFullScreenContent: (error) {},
       );
-      await ad.show();
+      try {
+        await ad.show();
+      } on PlatformException catch (error) {
+        if (error.code == 'ADS_ACTIVITY_REQUIRED' ||
+            error.code == 'ADS_SHOW_IN_PROGRESS') {
+          // 保留这个已加载对象，稍后重试 show()。
+          return;
+        }
+        // 该对象已进入终态；移除引用并重新加载新广告。
+      }
     },
     onAdFailedToLoad: (error) {},
   ),
 );
 ```
+
+以上代码需要从 `package:flutter/services.dart` 导入 `PlatformException`。
 
 激励视频使用 `JoliboxRewardedAd.load`，并在 `show` 中传入
 `onUserEarnedReward`。奖励回调不包含金额或类型。
@@ -200,18 +326,6 @@ JoliboxInterstitialAd.load(
 
 iOS 宿主若曾使用旧版 Flutter Swift Package Manager 接入，需要从 application target
 删除该依赖，并按 iOS 配置章节改用 CocoaPods。
-
-## 可选的 Flutter 初始化
-
-仅当宿主明确让 Flutter 负责第一次原生初始化时调用。若混编宿主已经在原生层
-初始化，不应再次调用。
-
-```dart
-await JoliboxAdsFlutter.initialize(
-  joliSource: suppliedConfiguration,
-  environment: JoliboxMediationEnvironment.staging,
-);
-```
 
 ## 错误与回调
 

@@ -4,6 +4,11 @@ This is a runnable mixed Android/iOS host example, not a Flutter-only snippet.
 It covers Banner, Interstitial, and Rewarded ads. It does not contain a real
 `joliSource`, scene, ad unit ID, or other environment credential.
 
+This example deliberately uses the mixed native/Flutter initialization mode.
+A pure Flutter host should use the Dart initialization mode documented in the
+parent integration guide and should not copy this example's private readiness
+channel.
+
 The checked-in Android manifest and iOS plist use Google's official sample
 AdMob App IDs so the example is safe to run during development. A production
 host must replace them with its own App IDs in
@@ -24,12 +29,13 @@ initialization completion instead.
 
 ## Run
 
-1. Follow the native Android or iOS setup in the parent
+1. Confirm that `flutter --version` reports exactly `3.22.3`.
+2. Follow the native Android or iOS setup in the parent
    [integration guide](../README.md).
-2. Copy `qa.local.json.example` to `qa.local.json` and set `JOLIBOX_SCENE`.
+3. Copy `qa.local.json.example` to `qa.local.json` and set `JOLIBOX_SCENE`.
    The local file is ignored by Git.
    Configure only the native platform that you are about to run.
-3. Append the following native configuration to the ignored
+4. Append the following native configuration to the ignored
    `android/local.properties` file:
 
    ```properties
@@ -37,7 +43,7 @@ initialization completion instead.
    jolibox.environment=staging
    ```
 
-4. For iOS, copy the ignored local configuration template and set the same
+5. For iOS, copy the ignored local configuration template and set the same
    supplied value:
 
    ```bash
@@ -50,7 +56,7 @@ initialization completion instead.
    JOLIBOX_ENVIRONMENT = staging
    ```
 
-5. Run the example with the local scene configuration:
+6. Run the example with the local scene configuration:
 
    ```bash
    flutter run --dart-define-from-file=qa.local.json
