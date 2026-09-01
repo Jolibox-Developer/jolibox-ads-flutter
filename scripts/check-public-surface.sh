@@ -94,6 +94,11 @@ check_xcframework() {
     exit 1
   }
 
+  if /usr/bin/find "$XCFRAMEWORK_DIR" -type d -name _CodeSignature -print -quit | /usr/bin/grep -q .; then
+    echo "Bundled XCFramework contains a stale build-time code signature." >&2
+    exit 1
+  fi
+
   while IFS= read -r -d '' candidate; do
     matches=$(/usr/bin/strings "$candidate" | /usr/bin/grep -E '/Users/|/Volumes/|file://|\\/Users\\/|\\/Volumes\\/|file:\\/\\/' || true)
     if [[ -n "$matches" ]]; then

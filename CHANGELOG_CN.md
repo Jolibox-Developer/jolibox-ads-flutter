@@ -2,6 +2,12 @@
 
 > English documentation: [CHANGELOG.md](CHANGELOG.md)
 
+## 0.6.8
+
+- 内置已从远端验证、且不含失效归档期签名的 iOS `0.6.4` XCFramework。
+- 扩展公开面检查，拒绝内置构建期代码签名。
+- 保持 Flutter `3.22.3`、Kotlin `2.0.21`、Android Native `0.6.2`、Android Google Mobile Ads `24.0.0` 与 iOS Google Mobile Ads `12.1.0`。
+
 ## 0.6.7
 
 - 将内置 iOS 原生 framework 替换为不含本机构建路径的 iOS `0.6.3` XCFramework。
