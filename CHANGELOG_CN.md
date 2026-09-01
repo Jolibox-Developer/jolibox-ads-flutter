@@ -2,6 +2,12 @@
 
 > English documentation: [CHANGELOG.md](CHANGELOG.md)
 
+## 0.7.0
+
+- Banner Widget 默认在原生广告可展示前折叠布局；加载失败时不再留下空 Banner 位。
+- 新增 `JoliboxBannerLayoutMode.reserveSpace`，供需要在加载期间预留 Banner 高度的宿主使用。
+- Android 与 iOS 仅在原生 Banner View 已挂载且具有非零布局尺寸后，才向 Flutter 发送加载成功回调。
+
 ## 0.6.8
 
 - 内置已从远端验证、且不含失效归档期签名的 iOS `0.6.4` XCFramework。

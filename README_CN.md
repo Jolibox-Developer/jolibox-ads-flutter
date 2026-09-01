@@ -37,7 +37,7 @@ dependencies:
   jolibox_ads_flutter:
     git:
       url: https://github.com/Jolibox-Developer/jolibox-ads-flutter.git
-      ref: 0.6.8
+      ref: 0.7.0
 ```
 
 解析依赖前先执行 `flutter --version`，确认输出严格为 `3.22.3`，再执行
@@ -153,11 +153,11 @@ class HostApplication : Application() {
 
 ### iOS
 
-Flutter 桥接 `0.6.8` 固定要求 Flutter `3.22.3`，iOS 制品仅通过 CocoaPods 交付，
+Flutter 桥接 `0.7.0` 固定要求 Flutter `3.22.3`，iOS 制品仅通过 CocoaPods 交付，
 内置原生聚合 SDK `0.6.4`，并解析 Google Mobile Ads SDK `12.1.0`；除非后续提供新的
 原生 SDK，否则 Android Maven 仓库仍使用 `0.6.2`。旧版本文档中基于 Flutter Swift Package Manager 的接入方式
 不支持用于本版本。已有 iOS 宿主必须迁移到下方的 CocoaPods 步骤；若无法使用
-CocoaPods，则无法接入 `0.6.8`。
+CocoaPods，则无法接入 `0.7.0`。
 
 插件通过 CocoaPods 链接随包提供的原生 XCFramework。在 Flutter 应用根目录执行：
 
@@ -167,7 +167,7 @@ cd ios && pod install && cd ..
 ```
 
 `pod install` 完成后检查 `ios/Podfile.lock`，其中必须解析为
-`jolibox_ads_flutter (0.6.8)` 与 `Google-Mobile-Ads-SDK (12.1.0)`。不要仅为改变版本而
+`jolibox_ads_flutter (0.7.0)` 与 `Google-Mobile-Ads-SDK (12.1.0)`。不要仅为改变版本而
 删除现有 lockfile；若任一版本不符，应先检查 Flutter 依赖选择的 Tag 和宿主 Pod
 版本约束。
 
@@ -265,6 +265,9 @@ Widget 与加载操作，也可以提供明确的重试入口。使用这种模�
 `JoliboxBannerAd` 自身管理原生 PlatformView。将它放到需要展示广告的 Widget
 树中；移除该 Widget 时会自动销毁原生 Banner。
 
+默认模式下，Banner 在原生 View 已加载、挂载并可展示前不占用页面高度；加载失败也不会
+留下空 Banner 位。这是新宿主推荐使用的模式。
+
 ```dart
 JoliboxBannerAd(
   scene: 'YOUR_SCENE',
@@ -277,6 +280,16 @@ JoliboxBannerAd(
 ```
 
 目前支持固定尺寸：`banner`、`largeBanner`、`mediumRectangle`。
+
+如需在加载期间和加载失败后仍预留请求的 Banner 高度，请显式指定：
+
+```dart
+JoliboxBannerAd(
+  scene: 'YOUR_SCENE',
+  size: JoliboxBannerSize.banner,
+  layoutMode: JoliboxBannerLayoutMode.reserveSpace,
+)
+```
 
 ## 插屏与激励视频
 

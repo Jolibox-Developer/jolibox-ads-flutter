@@ -32,6 +32,8 @@ class JoliboxAdsExamplePage extends StatefulWidget {
 
 class _JoliboxAdsExamplePageState extends State<JoliboxAdsExamplePage> {
   JoliboxBannerSize _bannerSize = JoliboxBannerSize.banner;
+  JoliboxBannerLayoutMode _bannerLayoutMode =
+      JoliboxBannerLayoutMode.collapseUntilLoaded;
   JoliboxInterstitialAd? _interstitialAd;
   JoliboxRewardedAd? _rewardedAd;
   bool _nativeInitialized = false;
@@ -230,10 +232,31 @@ class _JoliboxAdsExamplePageState extends State<JoliboxAdsExamplePage> {
                   : null,
             ),
             const SizedBox(height: 12),
+            DropdownButtonFormField<JoliboxBannerLayoutMode>(
+              value: _bannerLayoutMode,
+              decoration: const InputDecoration(labelText: 'Banner layout'),
+              items: JoliboxBannerLayoutMode.values
+                  .map(
+                    (mode) => DropdownMenuItem(
+                      value: mode,
+                      child: Text(_bannerLayoutModeLabel(mode)),
+                    ),
+                  )
+                  .toList(),
+              onChanged: controlsEnabled
+                  ? (mode) {
+                      if (mode != null) {
+                        setState(() => _bannerLayoutMode = mode);
+                      }
+                    }
+                  : null,
+            ),
+            const SizedBox(height: 12),
             if (controlsEnabled)
               _BannerPreview(
                 scene: _scene,
                 size: _bannerSize,
+                layoutMode: _bannerLayoutMode,
                 onStatus: _setStatus,
               )
             else
@@ -306,6 +329,12 @@ String _bannerSizeLabel(JoliboxBannerSize size) => switch (size) {
       JoliboxBannerSize.mediumRectangle => 'Medium Rectangle (300 x 250)',
     };
 
+String _bannerLayoutModeLabel(JoliboxBannerLayoutMode mode) => switch (mode) {
+      JoliboxBannerLayoutMode.collapseUntilLoaded =>
+        'Show after load (default)',
+      JoliboxBannerLayoutMode.reserveSpace => 'Reserve space while loading',
+    };
+
 class _StatusCard extends StatelessWidget {
   const _StatusCard({required this.status});
 
@@ -326,11 +355,13 @@ class _BannerPreview extends StatelessWidget {
   const _BannerPreview({
     required this.scene,
     required this.size,
+    required this.layoutMode,
     required this.onStatus,
   });
 
   final String scene;
   final JoliboxBannerSize size;
+  final JoliboxBannerLayoutMode layoutMode;
   final ValueChanged<String> onStatus;
 
   @override
@@ -339,9 +370,11 @@ class _BannerPreview extends StatelessWidget {
       child: JoliboxBannerAd(
         scene: scene,
         size: size,
+        layoutMode: layoutMode,
         onLoaded: () => onStatus('Banner loaded.'),
         onFailedToLoad: (error) => onStatus(
-          'Banner load failed: ${error.code}${error.message == null ? '' : ': ${error.message}'}',
+          'Banner load failed: ${error.code}'
+          '${error.message == null ? '' : ': ${error.message}'}',
         ),
         onImpression: () => onStatus('Banner impression.'),
         onClicked: () => onStatus('Banner clicked.'),

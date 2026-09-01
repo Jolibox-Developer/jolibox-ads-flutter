@@ -41,7 +41,7 @@ dependencies:
   jolibox_ads_flutter:
     git:
       url: https://github.com/Jolibox-Developer/jolibox-ads-flutter.git
-      ref: 0.6.8
+      ref: 0.7.0
 ```
 
 Before resolving dependencies, run `flutter --version` and confirm that it
@@ -167,13 +167,13 @@ Declare that class on the host application element:
 
 ### iOS
 
-Flutter bridge `0.6.8` requires Flutter `3.22.3` and uses CocoaPods for iOS
+Flutter bridge `0.7.0` requires Flutter `3.22.3` and uses CocoaPods for iOS
 delivery. It bundles native mediation `0.6.4` and resolves
 Google Mobile Ads SDK `12.1.0`. Keep the Android Maven repository at `0.6.2`
 unless a later native SDK release is supplied. The Flutter Swift Package Manager integration
 documented for earlier releases is not supported by this release. An existing
 iOS host must migrate to the CocoaPods steps below; if CocoaPods cannot be used,
-it cannot integrate `0.6.8`.
+it cannot integrate `0.7.0`.
 
 The plugin links its bundled native XCFramework through CocoaPods. From the
 Flutter application root, run:
@@ -184,7 +184,7 @@ cd ios && pod install && cd ..
 ```
 
 After `pod install`, inspect `ios/Podfile.lock`. It must resolve
-`jolibox_ads_flutter (0.6.8)` and `Google-Mobile-Ads-SDK (12.1.0)`. Do not delete
+`jolibox_ads_flutter (0.7.0)` and `Google-Mobile-Ads-SDK (12.1.0)`. Do not delete
 an existing lockfile merely to change versions; if either value differs, first
 check the selected Flutter package ref and the host's Pod dependency
 constraints.
@@ -286,6 +286,10 @@ fullscreen `load` method until the state is ready. See the example's
 `JoliboxBannerAd` owns its native platform view. Add it to the widget tree where
 the banner should appear; removing the widget disposes the native banner.
 
+By default, a Banner reserves no layout space until its native view is loaded,
+attached, and ready to display. A failed load therefore leaves no empty Banner
+slot. This is the recommended mode for new hosts.
+
 ```dart
 JoliboxBannerAd(
   scene: 'YOUR_SCENE',
@@ -298,6 +302,17 @@ JoliboxBannerAd(
 ```
 
 Supported fixed sizes are `banner`, `largeBanner`, and `mediumRectangle`.
+
+To reserve the requested Banner height while it is loading or after a load
+failure, opt in explicitly:
+
+```dart
+JoliboxBannerAd(
+  scene: 'YOUR_SCENE',
+  size: JoliboxBannerSize.banner,
+  layoutMode: JoliboxBannerLayoutMode.reserveSpace,
+)
+```
 
 ## Interstitial and Rewarded ads
 

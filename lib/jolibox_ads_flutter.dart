@@ -150,6 +150,15 @@ enum JoliboxMediationEnvironment { staging, production }
 
 enum JoliboxBannerSize { banner, largeBanner, mediumRectangle }
 
+/// Controls whether a banner reserves its layout space before it is ready.
+enum JoliboxBannerLayoutMode {
+  /// Does not reserve space until the native banner has loaded and laid out.
+  collapseUntilLoaded,
+
+  /// Reserves the requested banner height while the banner is loading.
+  reserveSpace,
+}
+
 class JoliboxFullScreenContentCallback {
   const JoliboxFullScreenContentCallback({
     this.onAdShowedFullScreenContent,
@@ -329,6 +338,7 @@ class JoliboxBannerAd extends StatefulWidget {
     super.key,
     required this.scene,
     this.size = JoliboxBannerSize.banner,
+    this.layoutMode = JoliboxBannerLayoutMode.collapseUntilLoaded,
     this.onLoaded,
     this.onFailedToLoad,
     this.onImpression,
@@ -339,6 +349,9 @@ class JoliboxBannerAd extends StatefulWidget {
 
   final String scene;
   final JoliboxBannerSize size;
+  final JoliboxBannerLayoutMode layoutMode;
+
+  /// Called after the native banner is ready to be displayed.
   final VoidCallback? onLoaded;
   final ValueChanged<PlatformException>? onFailedToLoad;
   final VoidCallback? onImpression;
@@ -353,6 +366,7 @@ class JoliboxBannerAd extends StatefulWidget {
 class _JoliboxBannerAdState extends State<JoliboxBannerAd> {
   MethodChannel? _eventChannel;
   int _viewGeneration = 0;
+  _BannerLoadState _loadState = _BannerLoadState.idle;
 
   @override
   void didUpdateWidget(covariant JoliboxBannerAd oldWidget) {
@@ -361,6 +375,7 @@ class _JoliboxBannerAdState extends State<JoliboxBannerAd> {
       _viewGeneration++;
       _eventChannel?.setMethodCallHandler(null);
       _eventChannel = null;
+      _loadState = _BannerLoadState.idle;
     }
   }
 
@@ -379,30 +394,42 @@ class _JoliboxBannerAdState extends State<JoliboxBannerAd> {
       JoliboxBannerSize.largeBanner => 100.0,
       JoliboxBannerSize.mediumRectangle => 250.0,
     };
+    final shouldReserveSpace =
+        widget.layoutMode == JoliboxBannerLayoutMode.reserveSpace ||
+            _loadState == _BannerLoadState.loaded;
     final generation = _viewGeneration;
     final params = {
       'scene': JoliboxAdsFlutter._requireScene(widget.scene),
       'size': widget.size.name,
     };
-    return SizedBox(
-      height: height,
-      child: defaultTargetPlatform == TargetPlatform.android
-          ? AndroidView(
-              key: ValueKey('${widget.scene}:${widget.size.name}'),
-              viewType: 'jolibox_ads_flutter/banner',
-              creationParams: params,
-              creationParamsCodec: const StandardMessageCodec(),
-              onPlatformViewCreated: (id) =>
-                  _onPlatformViewCreated(id, generation),
-            )
-          : UiKitView(
-              key: ValueKey('${widget.scene}:${widget.size.name}'),
-              viewType: 'jolibox_ads_flutter/banner',
-              creationParams: params,
-              creationParamsCodec: const StandardMessageCodec(),
-              onPlatformViewCreated: (id) =>
-                  _onPlatformViewCreated(id, generation),
-            ),
+    // Keep the platform view mounted so native loading can start, while only
+    // reserving layout space after the banner has loaded successfully.
+    return ClipRect(
+      child: AnimatedAlign(
+        alignment: Alignment.topCenter,
+        heightFactor: shouldReserveSpace ? 1 : 0,
+        duration: const Duration(milliseconds: 200),
+        child: SizedBox(
+          height: height,
+          child: defaultTargetPlatform == TargetPlatform.android
+              ? AndroidView(
+                  key: ValueKey('${widget.scene}:${widget.size.name}'),
+                  viewType: 'jolibox_ads_flutter/banner',
+                  creationParams: params,
+                  creationParamsCodec: const StandardMessageCodec(),
+                  onPlatformViewCreated: (id) =>
+                      _onPlatformViewCreated(id, generation),
+                )
+              : UiKitView(
+                  key: ValueKey('${widget.scene}:${widget.size.name}'),
+                  viewType: 'jolibox_ads_flutter/banner',
+                  creationParams: params,
+                  creationParamsCodec: const StandardMessageCodec(),
+                  onPlatformViewCreated: (id) =>
+                      _onPlatformViewCreated(id, generation),
+                ),
+        ),
+      ),
     );
   }
 
@@ -421,6 +448,7 @@ class _JoliboxBannerAdState extends State<JoliboxBannerAd> {
       final arguments = call.arguments as Map<Object?, Object?>?;
       switch (call.method) {
         case 'onLoaded':
+          setState(() => _loadState = _BannerLoadState.loaded);
           widget.onLoaded?.call();
           break;
         case 'onImpression':
@@ -440,17 +468,22 @@ class _JoliboxBannerAdState extends State<JoliboxBannerAd> {
             code: arguments?['code'] as String? ?? 'ADS_LOAD_FAILED',
             message: arguments?['message'] as String?,
           );
+          setState(() => _loadState = _BannerLoadState.failed);
           widget.onFailedToLoad?.call(JoliboxAdsFlutter._publicError(error));
           break;
       }
     });
     if (!mounted || _eventChannel != channel) return;
+    _loadState = _BannerLoadState.loading;
     try {
       await channel.invokeMethod<void>('loadBanner');
     } on PlatformException catch (error) {
       if (mounted && _eventChannel == channel) {
+        setState(() => _loadState = _BannerLoadState.failed);
         widget.onFailedToLoad?.call(JoliboxAdsFlutter._publicError(error));
       }
     }
   }
 }
+
+enum _BannerLoadState { idle, loading, loaded, failed }

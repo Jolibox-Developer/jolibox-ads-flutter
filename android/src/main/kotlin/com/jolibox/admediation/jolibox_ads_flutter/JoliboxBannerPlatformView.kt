@@ -22,6 +22,8 @@ internal class JoliboxBannerPlatformView(
     private val size = size(arguments.string("size"))
     private val channel = MethodChannel(messenger, "jolibox_ads_flutter/banner/$viewId")
     private var banner: JoliboxBannerAd? = null
+    private var pendingLayoutView: View? = null
+    private var pendingLayoutListener: View.OnLayoutChangeListener? = null
 
     init {
         channel.setMethodCallHandler(::handle)
@@ -30,6 +32,7 @@ internal class JoliboxBannerPlatformView(
     override fun getView(): View = container
 
     override fun dispose() {
+        clearPendingLayoutListener()
         banner?.destroy()
         banner = null
         channel.setMethodCallHandler(null)
@@ -44,6 +47,7 @@ internal class JoliboxBannerPlatformView(
             result.error("INVALID_ARGUMENT", "A valid scene and banner size are required.", null)
             return
         }
+        clearPendingLayoutListener()
         banner?.destroy()
         container.removeAllViews()
         val nextBanner = JoliboxBannerAd(container.context)
@@ -57,12 +61,13 @@ internal class JoliboxBannerPlatformView(
                     FrameLayout.LayoutParams.MATCH_PARENT,
                     FrameLayout.LayoutParams.MATCH_PARENT,
                 ))
-                channel.invokeMethod("onLoaded", emptyMap<String, Any>())
                 result.success(null)
+                emitLoadedWhenLaidOut(nextBanner, view)
             }
 
             override fun onAdFailedToLoad(error: JoliboxAdError) {
                 if (banner !== nextBanner) return
+                clearPendingLayoutListener()
                 result.fail(error)
             }
 
@@ -86,5 +91,44 @@ internal class JoliboxBannerPlatformView(
         "largeBanner" -> BannerSize.LARGE_BANNER
         "mediumRectangle" -> BannerSize.MEDIUM_RECTANGLE
         else -> null
+    }
+
+    private fun emitLoadedWhenLaidOut(owner: JoliboxBannerAd, view: View) {
+        clearPendingLayoutListener()
+        var emitted = false
+        val listener = object : View.OnLayoutChangeListener {
+            override fun onLayoutChange(
+                changedView: View,
+                left: Int,
+                top: Int,
+                right: Int,
+                bottom: Int,
+                oldLeft: Int,
+                oldTop: Int,
+                oldRight: Int,
+                oldBottom: Int,
+            ) {
+                if (emitted || banner !== owner || changedView.width <= 0 || changedView.height <= 0) {
+                    return
+                }
+                emitted = true
+                clearPendingLayoutListener()
+                channel.invokeMethod("onLoaded", emptyMap<String, Any>())
+            }
+        }
+        pendingLayoutView = view
+        pendingLayoutListener = listener
+        view.addOnLayoutChangeListener(listener)
+        if (view.width > 0 && view.height > 0) {
+            listener.onLayoutChange(view, 0, 0, view.width, view.height, 0, 0, 0, 0)
+        }
+    }
+
+    private fun clearPendingLayoutListener() {
+        pendingLayoutView?.let { view ->
+            pendingLayoutListener?.let(view::removeOnLayoutChangeListener)
+        }
+        pendingLayoutView = null
+        pendingLayoutListener = null
     }
 }

@@ -1,6 +1,6 @@
 name: jolibox_ads_flutter
 description: Flutter bridge for Jolibox Ad Mediation.
-version: 0.6.8
+version: 0.7.0
 homepage: https://github.com/Jolibox-Developer/jolibox-ads-flutter
 
 environment:

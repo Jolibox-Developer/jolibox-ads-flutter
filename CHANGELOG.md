@@ -2,6 +2,12 @@
 
 > 中文说明：[CHANGELOG_CN.md](CHANGELOG_CN.md)
 
+## 0.7.0
+
+- Makes Banner widgets collapse their layout until the native ad is ready by default, so failed loads do not leave an empty Banner slot.
+- Adds `JoliboxBannerLayoutMode.reserveSpace` for hosts that prefer to reserve the requested Banner height while loading.
+- Delays the Flutter Banner loaded callback on Android and iOS until the native Banner view has been attached and has a non-zero layout size.
+
 ## 0.6.8
 
 - Bundles the remotely verified iOS `0.6.4` XCFramework without stale archive-time signatures.
