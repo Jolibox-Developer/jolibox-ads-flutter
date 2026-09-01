@@ -2,6 +2,12 @@
 
 > 中文说明：[CHANGELOG_CN.md](CHANGELOG_CN.md)
 
+## 0.6.7
+
+- Replaces the bundled iOS native framework with the path-clean iOS `0.6.3` XCFramework.
+- Extends public-surface checks to reject local paths, local dependency declarations, internal endpoints, and leaked paths in binary artifacts.
+- Keeps Flutter `3.22.3`, Kotlin `2.0.21`, Android native `0.6.2`, Google Mobile Ads Android `24.0.0`, and Google Mobile Ads iOS `12.1.0`.
+
 ## 0.6.6
 
 - Removes obsolete migration guidance from the integration documentation.

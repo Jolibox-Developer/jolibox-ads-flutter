@@ -2,6 +2,12 @@
 
 > English documentation: [CHANGELOG.md](CHANGELOG.md)
 
+## 0.6.7
+
+- 将内置 iOS 原生 framework 替换为不含本机构建路径的 iOS `0.6.3` XCFramework。
+- 扩展公开面检查，拒绝本地路径、本地依赖声明、内部地址以及二进制制品中的路径泄露。
+- 保持 Flutter `3.22.3`、Kotlin `2.0.21`、Android Native `0.6.2`、Android Google Mobile Ads `24.0.0` 与 iOS Google Mobile Ads `12.1.0`。
+
 ## 0.6.6
 
 - 删除接入文档中已过时的迁移说明。
