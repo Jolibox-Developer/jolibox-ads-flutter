@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'jolibox_ads_flutter'
-  s.version          = '0.6.8'
+  s.version          = '0.7.1'
   s.summary          = 'Flutter bridge for Jolibox Ad Mediation.'
   s.description      = <<-DESC
 Flutter bridge for the Jolibox native ad mediation SDK.

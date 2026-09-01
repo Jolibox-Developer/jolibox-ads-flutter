@@ -339,6 +339,7 @@ class JoliboxBannerAd extends StatefulWidget {
     required this.scene,
     this.size = JoliboxBannerSize.banner,
     this.layoutMode = JoliboxBannerLayoutMode.collapseUntilLoaded,
+    this.revealDuration = Duration.zero,
     this.onLoaded,
     this.onFailedToLoad,
     this.onImpression,
@@ -351,7 +352,18 @@ class JoliboxBannerAd extends StatefulWidget {
   final JoliboxBannerSize size;
   final JoliboxBannerLayoutMode layoutMode;
 
-  /// Called after the native banner is ready to be displayed.
+  /// Controls how long a collapsed banner takes to reveal its full height.
+  ///
+  /// The default [Duration.zero] reveals it immediately. A positive duration
+  /// animates the height change only when [layoutMode] is
+  /// [JoliboxBannerLayoutMode.collapseUntilLoaded]. It does not delay
+  /// [onLoaded].
+  final Duration revealDuration;
+
+  /// Called after the native banner is attached with a non-zero layout size.
+  ///
+  /// This runs before an optional [revealDuration] animation completes and
+  /// does not guarantee that the first native pixel has been drawn.
   final VoidCallback? onLoaded;
   final ValueChanged<PlatformException>? onFailedToLoad;
   final VoidCallback? onImpression;
@@ -408,7 +420,7 @@ class _JoliboxBannerAdState extends State<JoliboxBannerAd> {
       child: AnimatedAlign(
         alignment: Alignment.topCenter,
         heightFactor: shouldReserveSpace ? 1 : 0,
-        duration: const Duration(milliseconds: 200),
+        duration: widget.revealDuration,
         child: SizedBox(
           height: height,
           child: defaultTargetPlatform == TargetPlatform.android

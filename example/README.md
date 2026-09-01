@@ -75,9 +75,13 @@ Flutter controls wait before loading ads. Both `android/local.properties` and
 `ios/Runner/Config/Jolibox.local.xcconfig` are ignored by Git.
 
 After native initialization succeeds, the Banner Widget requests its ad
-automatically. Use the separate Load and Show controls to verify the
-Interstitial and Rewarded object lifecycles. On iOS, run `flutter pub get`,
-then `cd ios && pod install && cd ..` before opening `Runner.xcworkspace`.
-See the parent guide for production integration and callback semantics.
+automatically. Its default `collapseUntilLoaded` layout uses
+`revealDuration: Duration.zero`, so it takes no space before loading and
+reveals its full height without an animation. See the parent guide before
+opting in to a custom reveal duration. Use the separate Load and Show controls
+to verify the Interstitial and Rewarded object lifecycles. On iOS, run
+`flutter pub get`, then `cd ios && pod install && cd ..` before opening
+`Runner.xcworkspace`. See the parent guide for production integration and
+callback semantics.
 
 For Chinese, see [README_CN.md](README_CN.md).

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jolibox_ads_flutter/jolibox_ads_flutter.dart';
 
@@ -26,6 +27,56 @@ void main() {
     expect(JoliboxBannerSize.banner.name, 'banner');
     expect(JoliboxBannerSize.largeBanner.name, 'largeBanner');
     expect(JoliboxBannerSize.mediumRectangle.name, 'mediumRectangle');
+  });
+
+  test('banner reveal duration defaults to immediate', () {
+    const banner = JoliboxBannerAd(scene: 'checkout');
+
+    expect(banner.layoutMode, JoliboxBannerLayoutMode.collapseUntilLoaded);
+    expect(banner.revealDuration, Duration.zero);
+  });
+
+  test('banner accepts a custom reveal duration', () {
+    const banner = JoliboxBannerAd(
+      scene: 'checkout',
+      revealDuration: Duration(milliseconds: 100),
+    );
+
+    expect(banner.revealDuration, const Duration(milliseconds: 100));
+  });
+
+  testWidgets('banner forwards its reveal duration to the layout animation',
+      (tester) async {
+    try {
+      await tester.pumpWidget(
+        const Directionality(
+          textDirection: TextDirection.ltr,
+          child: JoliboxBannerAd(scene: 'checkout'),
+        ),
+      );
+
+      expect(
+        tester.widget<AnimatedAlign>(find.byType(AnimatedAlign)).duration,
+        Duration.zero,
+      );
+
+      await tester.pumpWidget(
+        const Directionality(
+          textDirection: TextDirection.ltr,
+          child: JoliboxBannerAd(
+            scene: 'checkout',
+            revealDuration: Duration(milliseconds: 100),
+          ),
+        ),
+      );
+
+      expect(
+        tester.widget<AnimatedAlign>(find.byType(AnimatedAlign)).duration,
+        const Duration(milliseconds: 100),
+      );
+    } finally {
+      debugDefaultTargetPlatformOverride = null;
+    }
   });
 
   test('fullscreen callback accepts optional handlers', () {

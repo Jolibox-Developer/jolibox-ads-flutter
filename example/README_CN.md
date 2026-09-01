@@ -64,9 +64,10 @@ Android 宿主通过 `RepositoriesMode.PREFER_SETTINGS` 集中管理依赖仓库
 Flutter 控件会在加载广告前等待结果。`android/local.properties` 与
 `ios/Runner/Config/Jolibox.local.xcconfig` 均已被 Git 忽略。
 
-原生初始化成功后，Banner Widget 会自动请求广告。插屏和激励视频使用独立的 Load、Show
-控件，用于验证对象式生命周期。iOS 请先执行 `flutter pub get`，再执行
-`cd ios && pod install && cd ..`，之后使用 Xcode 打开 `Runner.xcworkspace`。生产接入方式
-和回调语义请参考上级文档。
+原生初始化成功后，Banner Widget 会自动请求广告。默认的 `collapseUntilLoaded` 布局使用
+`revealDuration: Duration.zero`：加载前不占位，加载成功后无动画地恢复完整高度。如需自定义
+展开时长，请先参考上级文档。插屏和激励视频使用独立的 Load、Show 控件，用于验证对象式
+生命周期。iOS 请先执行 `flutter pub get`，再执行 `cd ios && pod install && cd ..`，之后使用
+Xcode 打开 `Runner.xcworkspace`。生产接入方式和回调语义请参考上级文档。
 
 For English, see [README.md](README.md).

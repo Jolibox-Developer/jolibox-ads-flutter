@@ -331,7 +331,7 @@ String _bannerSizeLabel(JoliboxBannerSize size) => switch (size) {
 
 String _bannerLayoutModeLabel(JoliboxBannerLayoutMode mode) => switch (mode) {
       JoliboxBannerLayoutMode.collapseUntilLoaded =>
-        'Show after load (default)',
+        'Show after load (default, no animation)',
       JoliboxBannerLayoutMode.reserveSpace => 'Reserve space while loading',
     };
 

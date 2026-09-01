@@ -2,6 +2,16 @@
 
 > English documentation: [CHANGELOG.md](CHANGELOG.md)
 
+## 0.7.1
+
+- `JoliboxBannerAd` 新增可选参数 `revealDuration`；默认值为
+  `Duration.zero`，折叠的 Banner 加载成功后立即恢复完整高度。
+- 宿主可按需显式启用自定义展开动画，例如
+  `Duration(milliseconds: 100)`；动画不会延迟 `onLoaded`。
+- 明确 Banner `onLoaded` 表示原生 View 已挂载且具有非零布局尺寸，不表示原生广告
+  首个像素已经绘制。
+- Flutter、Android 插件、CocoaPods 与 Example 包版本元数据统一更新为 `0.7.1`。
+
 ## 0.7.0
 
 - Banner Widget 默认在原生广告可展示前折叠布局；加载失败时不再留下空 Banner 位。

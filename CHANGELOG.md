@@ -2,6 +2,17 @@
 
 > 中文说明：[CHANGELOG_CN.md](CHANGELOG_CN.md)
 
+## 0.7.1
+
+- Adds an optional `revealDuration` to `JoliboxBannerAd`; it defaults to
+  `Duration.zero`, so collapsed Banners reveal their full height immediately.
+- Allows hosts to opt in to a custom reveal animation, such as
+  `Duration(milliseconds: 100)`, without delaying `onLoaded`.
+- Clarifies that Banner `onLoaded` means the native view is attached with a
+  non-zero layout size; it does not mean that the first native pixel was drawn.
+- Aligns Flutter, Android plugin, CocoaPods, and Example package metadata at
+  `0.7.1`.
+
 ## 0.7.0
 
 - Makes Banner widgets collapse their layout until the native ad is ready by default, so failed loads do not leave an empty Banner slot.
