@@ -108,7 +108,23 @@ check_xcframework() {
   done < <(/usr/bin/find "$XCFRAMEWORK_DIR" -type f -print0)
 }
 
+check_xcframework_does_not_define_google_mobile_ads_classes() {
+  local candidate
+  local definitions
+
+  while IFS= read -r -d '' candidate; do
+    definitions=$(/usr/bin/nm -m "$candidate" 2>/dev/null |
+      /usr/bin/grep 'external _OBJC_CLASS_\$_GAD' |
+      /usr/bin/grep -v '(undefined)' || true)
+    if [[ -n "$definitions" ]]; then
+      echo "Bundled XCFramework defines Google Mobile Ads Objective-C classes." >&2
+      exit 1
+    fi
+  done < <(/usr/bin/find "$XCFRAMEWORK_DIR" -type f -name JoliboxAdMediation -print0)
+}
+
 check_forbidden_local_references
 check_xcframework
+check_xcframework_does_not_define_google_mobile_ads_classes
 
 echo "Public surface check passed."

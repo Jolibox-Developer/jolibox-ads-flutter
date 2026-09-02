@@ -10,7 +10,7 @@ AdMob Banner, Interstitial, and Rewarded ads on Android and iOS.
 - Flutter `3.22.3`
 - Android: `minSdk 23`, Java 17, Kotlin `2.0.21`, and a final resolved Google
   Mobile Ads version of `24.0.0`
-- iOS `13.0` or later with Google Mobile Ads SDK `12.1.0`
+- iOS `13.0` or later with Google Mobile Ads SDK `12.14.0`, added to the Runner target through Xcode SPM
 - A released Jolibox Ad Mediation native SDK for each platform
 
 The verified Android baseline uses Android Gradle Plugin `8.6.1`, Gradle `8.7`,
@@ -41,7 +41,7 @@ dependencies:
   jolibox_ads_flutter:
     git:
       url: https://github.com/Jolibox-Developer/jolibox-ads-flutter.git
-      ref: 0.7.1
+      ref: 0.7.2
 ```
 
 Before resolving dependencies, run `flutter --version` and confirm that it
@@ -167,13 +167,13 @@ Declare that class on the host application element:
 
 ### iOS
 
-Flutter bridge `0.7.1` requires Flutter `3.22.3` and uses CocoaPods for iOS
-delivery. It bundles native mediation `0.6.4` and resolves
-Google Mobile Ads SDK `12.1.0`. Keep the Android Maven repository at `0.6.2`
-unless a later native SDK release is supplied. The Flutter Swift Package Manager integration
-documented for earlier releases is not supported by this release. An existing
-iOS host must migrate to the CocoaPods steps below; if CocoaPods cannot be used,
-it cannot integrate `0.7.1`.
+Flutter bridge `0.7.2` requires Flutter `3.22.3` and uses CocoaPods only to
+deliver the plugin and bundled native mediation `0.6.5`. Google Mobile Ads is
+not a CocoaPods dependency of this plugin: add Google Mobile Ads `12.14.0` to
+the Runner application target through Xcode SPM, so the application links the
+only copy. Keep the Android Maven repository at `0.6.2` unless a later native
+SDK release is supplied. Flutter `3.22.3` does not automatically manage Swift
+packages for plugins; this is a normal Xcode Runner-target package dependency.
 
 The plugin links its bundled native XCFramework through CocoaPods. From the
 Flutter application root, run:
@@ -184,14 +184,18 @@ cd ios && pod install && cd ..
 ```
 
 After `pod install`, inspect `ios/Podfile.lock`. It must resolve
-`jolibox_ads_flutter (0.7.1)` and `Google-Mobile-Ads-SDK (12.1.0)`. Do not delete
-an existing lockfile merely to change versions; if either value differs, first
-check the selected Flutter package ref and the host's Pod dependency
-constraints.
+`jolibox_ads_flutter (0.7.2)` and must not contain `Google-Mobile-Ads-SDK`.
+Do not delete an existing lockfile merely to change versions. Then open
+`ios/Runner.xcworkspace` in Xcode, add
+`https://github.com/googleads/swift-package-manager-google-mobile-ads.git` with
+exact version `12.14.0`, and link the `GoogleMobileAds` product to the Runner
+application target.
 
 Do not also add `JoliboxAdMediation` through Swift Package Manager to the same
 iOS application target; the Flutter plugin already bundles the matching
-framework. Add the host's AdMob App ID to `ios/Runner/Info.plist`:
+framework. The Runner target must own the single `GoogleMobileAds` SPM product;
+do not embed Google Mobile Ads in another binary framework. Add the host's
+AdMob App ID to `ios/Runner/Info.plist`:
 
 ```xml
 <key>GADApplicationIdentifier</key>

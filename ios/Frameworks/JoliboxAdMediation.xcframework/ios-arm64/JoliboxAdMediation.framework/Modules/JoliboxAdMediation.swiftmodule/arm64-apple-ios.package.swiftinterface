@@ -4,17 +4,11 @@
 // swift-module-flags-ignorable:  -formal-cxx-interoperability-mode=off -interface-compiler-version 6.3
 import CryptoKit
 import Foundation
-import GoogleMobileAds
 import Swift
 import UIKit
-import UserMessagingPlatform
 import _Concurrency
 import _StringProcessing
 import _SwiftConcurrencyShims
-public enum JoliboxAdMediationPackageProof {
-  public static let googleMobileAdsLinked: Swift.Bool
-  public static let userMessagingPlatformLinked: Swift.Bool
-}
 public enum MediationEnvironment : Swift.String {
   case staging, production
   public init?(rawValue: Swift.String)
@@ -78,7 +72,7 @@ public struct JoliboxAdsError : Foundation.LocalizedError {
   @_Concurrency.MainActor public static func initialize(joliSource: Swift.String, environment: JoliboxAdMediation.MediationEnvironment, completion: @escaping (Swift.Result<Swift.Void, JoliboxAdMediation.JoliboxAdsError>) -> Swift.Void)
   @_Concurrency.MainActor public static func isReady() -> Swift.Bool
 }
-@objc @_inheritsConvenienceInitializers @_Concurrency.MainActor final public class JoliboxBannerAd : ObjectiveC.NSObject, GoogleMobileAds.BannerViewDelegate {
+@objc @_inheritsConvenienceInitializers @_Concurrency.MainActor final public class JoliboxBannerAd : ObjectiveC.NSObject {
   @_Concurrency.MainActor weak final public var delegate: (any JoliboxAdMediation.JoliboxAdsEventDelegate)?
   @_Concurrency.MainActor final public var view: UIKit.UIView? {
     get
@@ -88,37 +82,22 @@ public struct JoliboxAdsError : Foundation.LocalizedError {
   }
   @_Concurrency.MainActor final public func load(scene: Swift.String, size: JoliboxAdMediation.JoliboxBannerSize, rootViewController: UIKit.UIViewController?) async throws
   @_Concurrency.MainActor final public func invalidate()
-  @_Concurrency.MainActor @preconcurrency @objc final public func bannerViewDidRecordImpression(_ bannerView: GoogleMobileAds.BannerView)
-  @_Concurrency.MainActor @preconcurrency @objc final public func bannerViewDidRecordClick(_ bannerView: GoogleMobileAds.BannerView)
-  @_Concurrency.MainActor @preconcurrency @objc final public func bannerViewWillPresentScreen(_ bannerView: GoogleMobileAds.BannerView)
-  @_Concurrency.MainActor @preconcurrency @objc final public func bannerViewDidDismissScreen(_ bannerView: GoogleMobileAds.BannerView)
-  @_Concurrency.MainActor @preconcurrency @objc final public func bannerView(_ bannerView: GoogleMobileAds.BannerView, didFailToReceiveAdWithError error: any Swift.Error)
   @_Concurrency.MainActor @objc override dynamic public init()
   @objc deinit
 }
-@objc @_inheritsConvenienceInitializers @_Concurrency.MainActor final public class JoliboxInterstitialAd : ObjectiveC.NSObject, GoogleMobileAds.FullScreenContentDelegate {
+@objc @_inheritsConvenienceInitializers @_Concurrency.MainActor final public class JoliboxInterstitialAd : ObjectiveC.NSObject {
   @_Concurrency.MainActor weak final public var delegate: (any JoliboxAdMediation.JoliboxAdsEventDelegate)?
   @_Concurrency.MainActor final public func load(scene: Swift.String) async throws
   @_Concurrency.MainActor final public func show(from controller: UIKit.UIViewController?) throws
   @_Concurrency.MainActor final public func invalidate()
-  @_Concurrency.MainActor @preconcurrency @objc final public func adWillPresentFullScreenContent(_ ad: any GoogleMobileAds.FullScreenPresentingAd)
-  @_Concurrency.MainActor @preconcurrency @objc final public func adDidRecordImpression(_ ad: any GoogleMobileAds.FullScreenPresentingAd)
-  @_Concurrency.MainActor @preconcurrency @objc final public func adDidRecordClick(_ ad: any GoogleMobileAds.FullScreenPresentingAd)
-  @_Concurrency.MainActor @preconcurrency @objc final public func adDidDismissFullScreenContent(_ ad: any GoogleMobileAds.FullScreenPresentingAd)
-  @_Concurrency.MainActor @preconcurrency @objc final public func ad(_ ad: any GoogleMobileAds.FullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: any Swift.Error)
   @_Concurrency.MainActor @objc override dynamic public init()
   @objc deinit
 }
-@objc @_inheritsConvenienceInitializers @_Concurrency.MainActor final public class JoliboxRewardedAd : ObjectiveC.NSObject, GoogleMobileAds.FullScreenContentDelegate {
+@objc @_inheritsConvenienceInitializers @_Concurrency.MainActor final public class JoliboxRewardedAd : ObjectiveC.NSObject {
   @_Concurrency.MainActor weak final public var delegate: (any JoliboxAdMediation.JoliboxAdsEventDelegate)?
   @_Concurrency.MainActor final public func load(scene: Swift.String) async throws
   @_Concurrency.MainActor final public func show(from controller: UIKit.UIViewController?) throws
   @_Concurrency.MainActor final public func invalidate()
-  @_Concurrency.MainActor @preconcurrency @objc final public func adWillPresentFullScreenContent(_ ad: any GoogleMobileAds.FullScreenPresentingAd)
-  @_Concurrency.MainActor @preconcurrency @objc final public func adDidRecordImpression(_ ad: any GoogleMobileAds.FullScreenPresentingAd)
-  @_Concurrency.MainActor @preconcurrency @objc final public func adDidRecordClick(_ ad: any GoogleMobileAds.FullScreenPresentingAd)
-  @_Concurrency.MainActor @preconcurrency @objc final public func adDidDismissFullScreenContent(_ ad: any GoogleMobileAds.FullScreenPresentingAd)
-  @_Concurrency.MainActor @preconcurrency @objc final public func ad(_ ad: any GoogleMobileAds.FullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: any Swift.Error)
   @_Concurrency.MainActor @objc override dynamic public init()
   @objc deinit
 }

@@ -2,6 +2,12 @@
 
 > English documentation: [CHANGELOG.md](CHANGELOG.md)
 
+## 0.7.2
+
+- 内置 iOS 原生聚合 `0.6.5`，其公开 Swift interface 不再暴露 Google Mobile Ads 与 UMP 实现类型。
+- 移除插件级 Google Mobile Ads CocoaPods 依赖。
+- 要求 iOS Runner 应用 target 通过 Xcode SPM 链接唯一的 Google Mobile Ads `12.14.0` product。
+
 ## 0.7.1
 
 - `JoliboxBannerAd` 新增可选参数 `revealDuration`；默认值为

@@ -2,6 +2,12 @@
 
 > 中文说明：[CHANGELOG_CN.md](CHANGELOG_CN.md)
 
+## 0.7.2
+
+- Bundles iOS mediation `0.6.5`, whose public Swift interface hides Google Mobile Ads and UMP implementation types.
+- Removes the plugin-level CocoaPods dependency on Google Mobile Ads.
+- Requires the iOS Runner application target to link the single Google Mobile Ads `12.14.0` product through Xcode SPM.
+
 ## 0.7.1
 
 - Adds an optional `revealDuration` to `JoliboxBannerAd`; it defaults to
