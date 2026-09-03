@@ -2,6 +2,11 @@
 
 > 中文说明：[CHANGELOG_CN.md](CHANGELOG_CN.md)
 
+## 0.7.3
+
+- Bundles iOS mediation `0.6.6`, rebuilt against Google Mobile Ads `12.1.0`.
+- Requires the iOS Runner application target to link the single Google Mobile Ads `12.1.0` product through Xcode SPM.
+
 ## 0.7.2
 
 - Bundles iOS mediation `0.6.5`, whose public Swift interface hides Google Mobile Ads and UMP implementation types.

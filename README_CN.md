@@ -10,7 +10,7 @@ Jolibox Ad Mediation 原生 SDK 的 Flutter 桥接，支持 Android 与 iOS 的
 - Flutter `3.22.3`
 - Android：`minSdk 23`、Java 17、Kotlin `2.0.21`，且最终解析的 Google
   Mobile Ads 版本为 `24.0.0`
-- iOS `13.0` 及以上；Google Mobile Ads SDK `12.14.0` 必须由 Runner target 通过 Xcode SPM 添加
+- iOS `13.0` 及以上；Google Mobile Ads SDK `12.1.0` 必须由 Runner target 通过 Xcode SPM 添加
 - 已提供对应平台的 Jolibox Ad Mediation 原生 SDK 制品
 
 Android 已验收基线为 Android Gradle Plugin `8.6.1`、Gradle `8.7`、
@@ -37,7 +37,7 @@ dependencies:
   jolibox_ads_flutter:
     git:
       url: https://github.com/Jolibox-Developer/jolibox-ads-flutter.git
-      ref: 0.7.2
+      ref: 0.7.3
 ```
 
 解析依赖前先执行 `flutter --version`，确认输出严格为 `3.22.3`，再执行
@@ -153,9 +153,9 @@ class HostApplication : Application() {
 
 ### iOS
 
-Flutter 桥接 `0.7.2` 固定要求 Flutter `3.22.3`。iOS 仍通过 CocoaPods 交付插件和内置的
-原生聚合 SDK `0.6.5`，但插件不再通过 CocoaPods 解析 Google Mobile Ads；必须由 Runner
-应用 target 通过 Xcode SPM 添加唯一的 Google Mobile Ads `12.14.0`。除非后续提供新的原生
+Flutter 桥接 `0.7.3` 固定要求 Flutter `3.22.3`。iOS 仍通过 CocoaPods 交付插件和内置的
+原生聚合 SDK `0.6.6`，但插件不再通过 CocoaPods 解析 Google Mobile Ads；必须由 Runner
+应用 target 通过 Xcode SPM 添加唯一的 Google Mobile Ads `12.1.0`。除非后续提供新的原生
 SDK，否则 Android Maven 仓库仍使用 `0.6.2`。Flutter `3.22.3` 不会自动为插件管理 Swift
 Package；这里是正常的 Xcode Runner target 包依赖。
 
@@ -167,10 +167,10 @@ cd ios && pod install && cd ..
 ```
 
 `pod install` 完成后检查 `ios/Podfile.lock`：其中必须解析为
-`jolibox_ads_flutter (0.7.2)`，且不得包含 `Google-Mobile-Ads-SDK`。不要仅为改变版本而
+`jolibox_ads_flutter (0.7.3)`，且不得包含 `Google-Mobile-Ads-SDK`。不要仅为改变版本而
 删除现有 lockfile。随后用 Xcode 打开 `ios/Runner.xcworkspace`，添加
 `https://github.com/googleads/swift-package-manager-google-mobile-ads.git`，精确版本为
-`12.14.0`，并把 `GoogleMobileAds` product 链接到 Runner 应用 target。
+`12.1.0`，并把 `GoogleMobileAds` product 链接到 Runner 应用 target。
 
 同一个 iOS application target 不应再通过 Swift Package Manager 引入
 `JoliboxAdMediation`；Flutter 插件已经内置匹配的 framework。Runner target 必须唯一拥有
