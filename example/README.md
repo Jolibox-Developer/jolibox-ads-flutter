@@ -3,7 +3,9 @@
 > Historical single-package host example. For the current one-Flutter-module,
 > native-optional bridge, use [the native channel hosts](../examples/native_channels/)
 > and [the current integration guide](../README.md). This example's existing
-> host changes and SPM settings are intentionally preserved.
+> host changes and SPM settings are intentionally preserved. Its dependency is
+> pinned to `0.7.3`; use the [0.7.3 integration guide](https://github.com/Jolibox-Developer/jolibox-ads-flutter/blob/0.7.3/README.md)
+> when running this historical example.
 
 This is a runnable mixed Android/iOS host example, not a Flutter-only snippet.
 It covers Banner, Interstitial, and Rewarded ads. It does not contain a real
@@ -11,7 +13,7 @@ It covers Banner, Interstitial, and Rewarded ads. It does not contain a real
 
 This example deliberately uses the mixed native/Flutter initialization mode.
 A pure Flutter host should use the Dart initialization mode documented in the
-parent integration guide and should not copy this example's private readiness
+0.7.3 integration guide and should not copy this example's private readiness
 channel.
 
 The Android host centralizes dependency repositories with
@@ -41,8 +43,8 @@ initialization completion instead.
 ## Run
 
 1. Confirm that `flutter --version` reports exactly `3.22.3`.
-2. Follow the native Android or iOS setup in the parent
-   [integration guide](../README.md).
+2. Follow the native Android or iOS setup in the
+   [0.7.3 integration guide](https://github.com/Jolibox-Developer/jolibox-ads-flutter/blob/0.7.3/README.md).
 3. Copy `qa.local.json.example` to `qa.local.json` and set `JOLIBOX_SCENE`.
    The local file is ignored by Git.
    Configure only the native platform that you are about to run.
@@ -82,11 +84,11 @@ Flutter controls wait before loading ads. Both `android/local.properties` and
 After native initialization succeeds, the Banner Widget requests its ad
 automatically. Its default `collapseUntilLoaded` layout uses
 `revealDuration: Duration.zero`, so it takes no space before loading and
-reveals its full height without an animation. See the parent guide before
+reveals its full height without an animation. See the 0.7.3 guide before
 opting in to a custom reveal duration. Use the separate Load and Show controls
 to verify the Interstitial and Rewarded object lifecycles. On iOS, run
 `flutter pub get`, then `cd ios && pod install && cd ..` before opening
-`Runner.xcworkspace`. See the parent guide for production integration and
+`Runner.xcworkspace`. See the 0.7.3 guide for production integration and
 callback semantics.
 
 For Chinese, see [README_CN.md](README_CN.md).

@@ -2,6 +2,17 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+
+# Check the index so accidentally staged workspace documents block publication.
+if git -C "$ROOT_DIR" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  internal_documents=$(git -C "$ROOT_DIR" ls-files --cached -- \
+    project-specs AGENTS.md CLAUDE.md teamwork-space.md .teamwork-local-env)
+  if [[ -n "$internal_documents" ]]; then
+    echo "Internal workspace documents must not be tracked in this public repository." >&2
+    exit 1
+  fi
+fi
+
 PUBLIC_PATHS=(
   "$ROOT_DIR/README.md"
   "$ROOT_DIR/README_CN.md"

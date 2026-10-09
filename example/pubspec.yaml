@@ -20,13 +20,11 @@ dependencies:
     sdk: flutter
 
   jolibox_ads_flutter:
-    # This repository's bundled example uses the parent package directly.
-    # A real host application should use the released Git tag instead:
-    #   jolibox_ads_flutter:
-    #     git:
-    #       url: https://github.com/Jolibox-Developer/jolibox-ads-flutter.git
-    #       ref: 0.7.3
-    path: ../
+    # This historical host uses the automatic native plugin from release 0.7.3.
+    # The current root package uses explicitly registered optional native bridges.
+    git:
+      url: https://github.com/Jolibox-Developer/jolibox-ads-flutter.git
+      ref: 0.7.3
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

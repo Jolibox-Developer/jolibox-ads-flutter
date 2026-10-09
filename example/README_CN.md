@@ -2,12 +2,13 @@
 
 > 这是历史单包混编宿主示例。当前“统一 Flutter module + 原生可选桥接”的接入请看
 > [原生双配置示例](../examples/native_channels/)及[当前接入说明](../README_CN.md)。
-> 本示例已有宿主改动和 SPM 配置保留原样。
+> 本示例已有宿主改动和 SPM 配置保留原样，依赖固定为 `0.7.3`。
+> 运行此历史示例时，请使用 [0.7.3 接入说明](https://github.com/Jolibox-Developer/jolibox-ads-flutter/blob/0.7.3/README_CN.md)。
 
 这是可运行的 Android/iOS 混编宿主示例，不是只包含 Flutter 调用的代码片段。它覆盖
 Banner、插屏和激励视频广告，不包含真实的 `joliSource`、场景值、广告位 ID 或其他环境凭据。
 
-本 Example 刻意使用原生/Flutter 混编初始化模式。纯 Flutter 宿主应使用上级接入文档中的
+本 Example 刻意使用原生/Flutter 混编初始化模式。纯 Flutter 宿主应使用 0.7.3 接入文档中的
 Dart 初始化模式，不应复制 Example 的私有就绪状态 Channel。
 
 Android 宿主通过 `RepositoriesMode.PREFER_SETTINGS` 集中管理依赖仓库。Flutter
@@ -34,7 +35,7 @@ Android 宿主通过 `RepositoriesMode.PREFER_SETTINGS` 集中管理依赖仓库
 ## 运行方式
 
 1. 确认 `flutter --version` 输出的版本严格为 `3.22.3`。
-2. 先按上级[接入文档](../README_CN.md)完成 Android 或 iOS 原生配置。
+2. 先按 [0.7.3 接入文档](https://github.com/Jolibox-Developer/jolibox-ads-flutter/blob/0.7.3/README_CN.md)完成 Android 或 iOS 原生配置。
 3. 将 `qa.local.json.example` 复制为 `qa.local.json`，填写 `JOLIBOX_SCENE`。该本地
    文件已被 Git 忽略。
    仅配置当前准备运行的平台对应的原生参数即可。
@@ -70,8 +71,8 @@ Flutter 控件会在加载广告前等待结果。`android/local.properties` 与
 
 原生初始化成功后，Banner Widget 会自动请求广告。默认的 `collapseUntilLoaded` 布局使用
 `revealDuration: Duration.zero`：加载前不占位，加载成功后无动画地恢复完整高度。如需自定义
-展开时长，请先参考上级文档。插屏和激励视频使用独立的 Load、Show 控件，用于验证对象式
+展开时长，请先参考 0.7.3 文档。插屏和激励视频使用独立的 Load、Show 控件，用于验证对象式
 生命周期。iOS 请先执行 `flutter pub get`，再执行 `cd ios && pod install && cd ..`，之后使用
-Xcode 打开 `Runner.xcworkspace`。生产接入方式和回调语义请参考上级文档。
+Xcode 打开 `Runner.xcworkspace`。生产接入方式和回调语义请参考 0.7.3 文档。
 
 For English, see [README.md](README.md).

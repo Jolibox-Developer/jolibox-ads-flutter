@@ -11,6 +11,7 @@ void main() {
     );
     expect(find.text('Banner'), findsOneWidget);
     expect(find.text('Load Interstitial'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('Load Rewarded'), 200);
     expect(find.text('Load Rewarded'), findsOneWidget);
   });
 }

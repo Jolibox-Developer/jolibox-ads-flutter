@@ -48,6 +48,9 @@ test_target.build_configurations.each do |configuration|
 end
 scheme = Xcodeproj::XCScheme.new
 scheme.configure_with_targets(apps.fetch('HostAds'), test_target)
+# CLI lifecycle tests do not need a debugger connection. Keep LaunchAction debug-enabled.
+scheme.test_action.xml_element.attributes['selectedDebuggerIdentifier'] = ''
+scheme.test_action.xml_element.attributes['selectedLauncherIdentifier'] = 'Xcode.IDEFoundation.Launcher.PosixSpawn'
 scheme.save_as(project_path, 'HostAds', true)
 
 project.build_configurations.each do |configuration|

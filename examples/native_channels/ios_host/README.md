@@ -19,3 +19,8 @@ also implement its production consent/privacy policy.
 `HostAdsTests` checks per-engine registration, duplicate registration and
 post-detach call rejection on an iOS simulator; real delayed SDK load callbacks
 still need controlled native test configuration.
+
+Run the lifecycle tests with `xcodebuild -workspace NativeChannelsHost.xcworkspace
+-scheme HostAds -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.4'
+-parallel-testing-enabled NO test`. Choose an installed simulator when needed.
+The test action starts without LLDB; normal app debugging remains enabled.
