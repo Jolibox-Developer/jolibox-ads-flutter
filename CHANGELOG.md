@@ -2,6 +2,13 @@
 
 > 中文说明：[CHANGELOG_CN.md](CHANGELOG_CN.md)
 
+## 0.8.0 (unreleased)
+
+- Keeps one shared Flutter Dart API package while moving Android and iOS ad bridges to optional native host dependencies.
+- Preserves the existing ad API; without a registered native bridge, initialization and loads complete silently and Banners occupy no space.
+- Requires ads-enabled native hosts to register the bridge on each Flutter Engine before the first capability probe. Existing automatic plugin registration no longer installs this bridge.
+- Adds shared-module Android flavor and iOS target examples, lifecycle tests, and integration guidance. No Maven, Pod, or Git tag has been published for this version.
+
 ## 0.7.3
 
 - Bundles iOS mediation `0.6.6`, rebuilt against Google Mobile Ads `12.1.0`.

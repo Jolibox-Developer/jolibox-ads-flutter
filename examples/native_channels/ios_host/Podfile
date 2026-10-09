@@ -1,0 +1,28 @@
+platform :ios, '13.0'
+
+ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+module_path = File.expand_path('../flutter_module', __dir__)
+require File.join(module_path, '.ios', 'Flutter', 'podhelper.rb')
+
+project 'NativeChannelsHost', {
+  'Debug' => :debug,
+  'Release' => :release,
+}
+
+target 'HostBase' do
+  use_frameworks!
+  install_all_flutter_pods(module_path)
+end
+
+target 'HostAds' do
+  use_frameworks!
+  install_all_flutter_pods(module_path)
+  pod 'JoliboxFlutterAdsBridgeAdMob', :path => '../../../native/ios'
+  target 'HostAdsTests' do
+    inherit! :search_paths
+  end
+end
+
+post_install do |installer|
+  flutter_post_install(installer)
+end

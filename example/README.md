@@ -1,5 +1,10 @@
 # Jolibox Ads Flutter example
 
+> Historical single-package host example. For the current one-Flutter-module,
+> native-optional bridge, use [the native channel hosts](../examples/native_channels/)
+> and [the current integration guide](../README.md). This example's existing
+> host changes and SPM settings are intentionally preserved.
+
 This is a runnable mixed Android/iOS host example, not a Flutter-only snippet.
 It covers Banner, Interstitial, and Rewarded ads. It does not contain a real
 `joliSource`, scene, ad unit ID, or other environment credential.

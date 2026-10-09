@@ -2,6 +2,13 @@
 
 > English documentation: [CHANGELOG.md](CHANGELOG.md)
 
+## 0.8.0（未发布）
+
+- 保留统一的 Flutter Dart API 包，将 Android 和 iOS 广告桥接移为宿主原生侧的可选依赖。
+- 保留现有广告 API；当前 Engine 未注册原生桥接时，初始化和加载静默完成，Banner 不占位。
+- 有广告构建须在首次能力探测前，为每个 Flutter Engine 手动注册桥接；原有自动插件注册不再安装此桥接。
+- 新增共享 Flutter module 的 Android flavor、iOS target 示例、生命周期测试与接入说明；本版本尚未发布 Maven、Pod 或 Git tag。
+
 ## 0.7.3
 
 - 内置使用 Google Mobile Ads `12.1.0` 重新构建的 iOS 原生聚合 `0.6.6`。

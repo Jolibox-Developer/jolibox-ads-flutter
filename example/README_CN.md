@@ -1,5 +1,9 @@
 # Jolibox Ads Flutter 示例
 
+> 这是历史单包混编宿主示例。当前“统一 Flutter module + 原生可选桥接”的接入请看
+> [原生双配置示例](../examples/native_channels/)及[当前接入说明](../README_CN.md)。
+> 本示例已有宿主改动和 SPM 配置保留原样。
+
 这是可运行的 Android/iOS 混编宿主示例，不是只包含 Flutter 调用的代码片段。它覆盖
 Banner、插屏和激励视频广告，不包含真实的 `joliSource`、场景值、广告位 ID 或其他环境凭据。
 

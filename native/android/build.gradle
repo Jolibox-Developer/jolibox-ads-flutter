@@ -1,0 +1,60 @@
+plugins {
+    id "com.android.library"
+    id "org.jetbrains.kotlin.android"
+    id "maven-publish"
+}
+
+group = "com.jolibox.admediation"
+// Local verification coordinate only; no remote publication is configured.
+version = "0.8.0-local"
+
+android {
+    namespace = "com.jolibox.admediation.jolibox_ads_flutter"
+    compileSdk = 35
+
+    defaultConfig { minSdk = 23 }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    kotlinOptions { jvmTarget = "17" }
+
+    publishing { singleVariant("release") { withSourcesJar() } }
+
+    testOptions {
+        unitTests.all { useJUnitPlatform() }
+    }
+}
+
+def flutterEngineVersion = providers.gradleProperty("flutterEngineVersion")
+    .orElse("1.0.0-235db911ba279722f5e685f38b0ed30fa7e8570a")
+
+dependencies {
+    // The host provides its Flutter 3.22.3 Engine at runtime; embedding is not published.
+    compileOnly("io.flutter:flutter_embedding_debug:${flutterEngineVersion.get()}")
+    api("com.jolibox.android:jolibox-ad-mediation:0.6.2")
+
+    testImplementation("io.flutter:flutter_embedding_debug:${flutterEngineVersion.get()}")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.2")
+    testImplementation("org.mockito:mockito-core:5.0.0")
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+                artifactId = "jolibox-ads-flutter-bridge-admob"
+                pom {
+                    name = "Jolibox Flutter Ads Native Bridge (AdMob)"
+                    description = "Manually registered Android adapter for a host-provided Flutter Engine"
+                }
+            }
+        }
+        repositories {
+            maven { url = uri(layout.buildDirectory.dir("local-maven")) }
+        }
+    }
+}

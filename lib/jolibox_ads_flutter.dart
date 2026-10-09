@@ -13,15 +13,57 @@ class JoliboxAdsFlutter {
   JoliboxAdsFlutter._();
 
   static const MethodChannel _channel = MethodChannel('jolibox_ads_flutter');
+  static Future<bool>? _availabilityFuture;
   static final Map<String, _JoliboxObjectAd> _fullscreenAds = {};
   static bool _eventsRegistered = false;
   static String? _showingAdId;
+
+  /// Whether a compatible native ad implementation is registered.
+  ///
+  /// This does not initialize the SDK or indicate that an ad can be filled.
+  static Future<bool> isAvailable({bool refresh = false}) {
+    _ensureSupportedPlatform();
+    if (refresh) _availabilityFuture = null;
+    return _availabilityFuture ??= _probeAvailability();
+  }
+
+  static Future<bool> _probeAvailability() async {
+    try {
+      final capabilities = await _channel
+          .invokeMapMethod<String, dynamic>('getCapabilities')
+          .timeout(const Duration(seconds: 3));
+      if (capabilities?['protocolVersion'] != 1 ||
+          capabilities?['provider'] != 'admob' ||
+          capabilities?['banner'] != true ||
+          capabilities?['interstitial'] != true ||
+          capabilities?['rewarded'] != true) {
+        throw StateError('Incompatible Jolibox native ad implementation.');
+      }
+      return true;
+    } on MissingPluginException {
+      // A missing method and a missing channel both surface as
+      // MissingPluginException. The old bridge has the channel but not
+      // getCapabilities; its loader rejects an empty scene before touching
+      // the SDK, so this distinguishes it from a base-only build.
+      try {
+        await _channel
+            .invokeMethod<Object?>('loadInterstitial', {'scene': ''})
+            .timeout(const Duration(seconds: 3));
+      } on MissingPluginException {
+        return false;
+      } on PlatformException {
+        throw StateError('Incompatible Jolibox native ad implementation.');
+      }
+      throw StateError('Incompatible Jolibox native ad implementation.');
+    }
+  }
 
   static Future<void> initialize({
     required String joliSource,
     required JoliboxMediationEnvironment environment,
   }) async {
     _ensureSupportedPlatform();
+    if (!await isAvailable()) return;
     try {
       await _channel.invokeMethod<void>('initialize', {
         'joliSource': joliSource,
@@ -39,6 +81,7 @@ class JoliboxAdsFlutter {
     ValueChanged<PlatformException> onFailedToLoad,
   ) async {
     _ensureSupportedPlatform();
+    if (!await isAvailable()) return;
     _ensureEventHandler();
     final normalizedScene = _requireScene(scene);
     late final String id;
@@ -379,6 +422,32 @@ class _JoliboxBannerAdState extends State<JoliboxBannerAd> {
   MethodChannel? _eventChannel;
   int _viewGeneration = 0;
   _BannerLoadState _loadState = _BannerLoadState.idle;
+  bool? _available;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAvailability();
+  }
+
+  Future<void> _checkAvailability() async {
+    final generation = _viewGeneration;
+    try {
+      final available = await JoliboxAdsFlutter.isAvailable();
+      if (!mounted || generation != _viewGeneration) return;
+      setState(() => _available = available);
+    } catch (error) {
+      if (!mounted || generation != _viewGeneration) return;
+      setState(() {
+        _available = false;
+        _loadState = _BannerLoadState.failed;
+      });
+      final failure = error is PlatformException
+          ? JoliboxAdsFlutter._publicError(error)
+          : PlatformException(code: 'ADS_BRIDGE_FAILED', message: '$error');
+      widget.onFailedToLoad?.call(failure);
+    }
+  }
 
   @override
   void didUpdateWidget(covariant JoliboxBannerAd oldWidget) {
@@ -388,6 +457,7 @@ class _JoliboxBannerAdState extends State<JoliboxBannerAd> {
       _eventChannel?.setMethodCallHandler(null);
       _eventChannel = null;
       _loadState = _BannerLoadState.idle;
+      if (_available == null) _checkAvailability();
     }
   }
 
@@ -401,6 +471,7 @@ class _JoliboxBannerAdState extends State<JoliboxBannerAd> {
   @override
   Widget build(BuildContext context) {
     JoliboxAdsFlutter._ensureSupportedPlatform();
+    if (_available != true) return const SizedBox.shrink();
     final height = switch (widget.size) {
       JoliboxBannerSize.banner => 50.0,
       JoliboxBannerSize.largeBanner => 100.0,

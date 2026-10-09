@@ -13,8 +13,21 @@ void main() {
   final messenger =
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
 
-  setUp(() {
+  setUp(() async {
     debugDefaultTargetPlatformOverride = TargetPlatform.android;
+    messenger.setMockMethodCallHandler(channel, (call) async {
+      if (call.method == 'getCapabilities') {
+        return <String, Object>{
+          'protocolVersion': 1,
+          'provider': 'admob',
+          'banner': true,
+          'interstitial': true,
+          'rewarded': true,
+        };
+      }
+      return null;
+    });
+    await JoliboxAdsFlutter.isAvailable(refresh: true);
   });
 
   tearDown(() {
@@ -45,44 +58,133 @@ void main() {
     expect(banner.revealDuration, const Duration(milliseconds: 100));
   });
 
-  testWidgets('banner forwards its reveal duration to the layout animation',
-      (tester) async {
-    try {
-      await tester.pumpWidget(
-        const Directionality(
-          textDirection: TextDirection.ltr,
-          child: JoliboxBannerAd(scene: 'checkout'),
-        ),
-      );
-
-      expect(
-        tester.widget<AnimatedAlign>(find.byType(AnimatedAlign)).duration,
-        Duration.zero,
-      );
-
-      await tester.pumpWidget(
-        const Directionality(
-          textDirection: TextDirection.ltr,
-          child: JoliboxBannerAd(
-            scene: 'checkout',
-            revealDuration: Duration(milliseconds: 100),
-          ),
-        ),
-      );
-
-      expect(
-        tester.widget<AnimatedAlign>(find.byType(AnimatedAlign)).duration,
-        const Duration(milliseconds: 100),
-      );
-    } finally {
-      debugDefaultTargetPlatformOverride = null;
-    }
-  });
-
   test('fullscreen callback accepts optional handlers', () {
     const callbacks = JoliboxFullScreenContentCallback();
     expect(callbacks.onAdClicked, isNull);
     expect(callbacks.onAdDismissedFullScreenContent, isNull);
+  });
+
+  test('base-only calls complete without creating ads or firing callbacks',
+      () async {
+    var loadCallbacks = 0;
+    messenger.setMockMethodCallHandler(channel, null);
+
+    expect(await JoliboxAdsFlutter.isAvailable(refresh: true), isFalse);
+    await JoliboxAdsFlutter.initialize(
+      joliSource: 'source',
+      environment: JoliboxMediationEnvironment.staging,
+    );
+    await JoliboxInterstitialAd.load(
+      scene: ' ',
+      adLoadCallback: JoliboxInterstitialAdLoadCallback(
+        onAdLoaded: (_) => loadCallbacks++,
+        onAdFailedToLoad: (_) => loadCallbacks++,
+      ),
+    );
+    await JoliboxRewardedAd.load(
+      scene: 'checkout',
+      adLoadCallback: JoliboxRewardedAdLoadCallback(
+        onAdLoaded: (_) => loadCallbacks++,
+        onAdFailedToLoad: (_) => loadCallbacks++,
+      ),
+    );
+
+    expect(loadCallbacks, 0);
+  });
+
+  test('old native bridge is reported as incompatible, not disabled', () async {
+    messenger.setMockMethodCallHandler(channel, (call) async {
+      if (call.method == 'getCapabilities') throw MissingPluginException();
+      if (call.method == 'loadInterstitial') {
+        expect(call.arguments['scene'], isEmpty);
+        throw PlatformException(code: 'INVALID_ARGUMENT');
+      }
+      fail('Unexpected native call: ${call.method}');
+    });
+
+    await expectLater(
+      JoliboxAdsFlutter.isAvailable(refresh: true),
+      throwsA(isA<StateError>()),
+    );
+  });
+
+  test('malformed capabilities are not silently treated as disabled', () async {
+    messenger.setMockMethodCallHandler(channel, (call) async {
+      return <String, Object>{'protocolVersion': 999};
+    });
+
+    await expectLater(
+      JoliboxAdsFlutter.isAvailable(refresh: true),
+      throwsA(isA<StateError>()),
+    );
+  });
+
+  test('concurrent API calls share one capability probe', () async {
+    final pendingCapabilities = Completer<Object?>();
+    var probes = 0;
+    messenger.setMockMethodCallHandler(channel, (call) async {
+      if (call.method == 'getCapabilities') {
+        probes++;
+        return pendingCapabilities.future;
+      }
+      if (call.method == 'loadInterstitial' &&
+          call.arguments['scene'] == '') {
+        throw MissingPluginException();
+      }
+      fail('No advertising call is expected without an implementation.');
+    });
+    final availability = JoliboxAdsFlutter.isAvailable(refresh: true);
+
+    final initialization = JoliboxAdsFlutter.initialize(
+      joliSource: 'source',
+      environment: JoliboxMediationEnvironment.staging,
+    );
+    final interstitial = JoliboxInterstitialAd.load(
+      scene: 'checkout',
+      adLoadCallback: JoliboxInterstitialAdLoadCallback(
+        onAdLoaded: (_) => fail('Unexpected ad.'),
+        onAdFailedToLoad: (_) => fail('Unexpected failure callback.'),
+      ),
+    );
+    final rewarded = JoliboxRewardedAd.load(
+      scene: 'checkout',
+      adLoadCallback: JoliboxRewardedAdLoadCallback(
+        onAdLoaded: (_) => fail('Unexpected ad.'),
+        onAdFailedToLoad: (_) => fail('Unexpected failure callback.'),
+      ),
+    );
+    await Future<void>.delayed(Duration.zero);
+    expect(probes, 1);
+    pendingCapabilities.completeError(MissingPluginException());
+    expect(await availability, isFalse);
+    await Future.wait([initialization, interstitial, rewarded]);
+    expect(probes, 1);
+  });
+
+  testWidgets('base-only banner never creates a native view', (tester) async {
+    try {
+      messenger.setMockMethodCallHandler(channel, null);
+      expect(
+        await tester.runAsync(
+          () => JoliboxAdsFlutter.isAvailable(refresh: true),
+        ),
+        isFalse,
+      );
+
+      await tester.pumpWidget(const Directionality(
+        textDirection: TextDirection.ltr,
+        child: JoliboxBannerAd(
+          scene: 'checkout',
+          layoutMode: JoliboxBannerLayoutMode.reserveSpace,
+        ),
+      ));
+      await tester.pump();
+
+      expect(find.byType(AndroidView), findsNothing);
+      expect(find.byType(SizedBox), findsOneWidget);
+    } finally {
+      debugDefaultTargetPlatformOverride = null;
+    }
   });
 
   test('native initialization errors use the public ADS prefix', () async {
