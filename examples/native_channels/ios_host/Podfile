@@ -17,7 +17,8 @@ end
 target 'HostAds' do
   use_frameworks!
   install_all_flutter_pods(module_path)
-  pod 'JoliboxFlutterAdsBridgeAdMob', :path => '../../../native/ios'
+  # Local checkout; production hosts can use this repository's 0.8.0 Git tag.
+  pod 'JoliboxFlutterAdsBridgeAdMob', :path => '../../..'
   target 'HostAdsTests' do
     inherit! :search_paths
   end

@@ -4,7 +4,7 @@
 
 `jolibox_ads_flutter` is one Dart API package for both native host configurations. It has no native plugin or advertising SDK dependency. The native host chooses whether to link the Android library or iOS Pod `JoliboxFlutterAdsBridgeAdMob`. That adapter brings Jolibox Ad Mediation and Google Mobile Ads into the ads-enabled native build. Both configurations use the same Flutter module, pubspec, lockfile, and Dart API.
 
-The native adapters are source deliverables in this repository. There is no published `0.8.0` Git tag, Maven coordinate, or Pod release yet. Do not put an unresolvable release version into a consuming host.
+Release `0.8.0` provides the Dart package and iOS Pod through the Git tag, and the Android adapter through the Maven directory in that same tag. See the [GitHub release](https://github.com/Jolibox-Developer/jolibox-ads-flutter/releases/tag/0.8.0). The iOS Pod uses an explicit Git dependency; it is not distributed through CocoaPods trunk.
 
 ## Supported baseline
 
@@ -15,12 +15,14 @@ The native adapters are source deliverables in this repository. There is no publ
 
 ## Shared Flutter dependency
 
-The host's Flutter module declares only the base Dart package. Both native configurations consume that same resolved module. For local development, see [the shared module](examples/native_channels/flutter_module/pubspec.yaml); it uses a relative path to this checkout. A published Git dependency can be substituted after an approved ref actually exists.
+The host's Flutter module declares only the base Dart package. Both native configurations consume that same resolved module. Pin the release tag in production; [the shared module](examples/native_channels/flutter_module/pubspec.yaml) uses a relative path for local development.
 
 ```yaml
 dependencies:
   jolibox_ads_flutter:
-    path: /path/to/jolibox-ads-flutter
+    git:
+      url: https://github.com/Jolibox-Developer/jolibox-ads-flutter.git
+      ref: 0.8.0
 ```
 
 The Flutter module must not depend on the old `jolibox_ads_flutter_admob` plugin. Rebuild any previously exported Flutter AAR/framework that still contains it.
@@ -37,7 +39,20 @@ dependencies {
 
 Only the ads flavor compiles its adapter import and registration wrapper. Register `JoliboxAdsFlutterPlugin()` on each ads-enabled `FlutterEngine` before Dart first calls `isAvailable()`. Preserve other plugins' normal registration. Add the host's AdMob App ID to the ads flavor manifest and initialize Jolibox Ads once, either from native code or via Dart. The base flavor must not inherit the App ID, SDK dependency, or initialization code through a shared module.
 
-For source integration, include `native/android` as an Android library. Its Gradle configuration also defines a local-only Maven publication; remote coordinates and artifacts are not published. A lone AAR does not convey the adapter's mediation dependency; a Maven consumer needs its POM.
+For a released binary, add these repositories to the host's settings-level dependency repositories, alongside `google()`, `mavenCentral()` and the existing Flutter repositories:
+
+```gradle
+maven { url = uri("https://raw.githubusercontent.com/Jolibox-Developer/jolibox-ads-flutter/0.8.0/maven/") }
+maven { url = uri("https://raw.githubusercontent.com/Jolibox-Developer/jolibox-ad-mediation-android-maven/0.6.2/") }
+```
+
+Replace the ads flavor's project dependency with:
+
+```gradle
+admobImplementation("com.jolibox.admediation:jolibox-ads-flutter-bridge-admob:0.8.0")
+```
+
+The Maven publication includes the AAR, POM and Gradle module metadata, so mediation and AdMob resolve transitively. Flutter embedding is supplied by the host. For source integration, keep the `native/android` project dependency instead.
 
 ## iOS native host
 
@@ -46,11 +61,15 @@ The [iOS two-target host](examples/native_channels/ios_host/README.md) demonstra
 ```ruby
 target 'HostAds' do
   install_all_flutter_pods(flutter_application_path)
-  pod 'JoliboxFlutterAdsBridgeAdMob', :path => '/path/to/jolibox-ads-flutter/native/ios'
+  pod 'JoliboxFlutterAdsBridgeAdMob',
+      :git => 'https://github.com/Jolibox-Developer/jolibox-ads-flutter.git',
+      :tag => '0.8.0'
 end
 ```
 
 `HostBase` installs the same Flutter module without the ad Pod. Keep the Pod out of any common parent target. Do not also link Google Mobile Ads or Jolibox through SPM or a manually embedded framework in the ads target. The native adapter uses the host's Flutter engine; it does not bundle another Flutter engine.
+
+For local development, use `:path => '/path/to/jolibox-ads-flutter'` instead of `:git`/`:tag`. The Podspec is at the repository root; its sources and vendored framework remain in `native/ios`.
 
 On Flutter 3.22.3 iOS, call `engine.run()` before registering method handlers. Then register other plugins and call `JoliboxAdsFlutterPlugin.register(with: engine)` once per ads-enabled engine. Dart must wait until registration completes before probing capabilities. The [host example](examples/native_channels/ios_host/HostAds/AppDelegate.swift) uses a small `waitForHostReady` channel in both targets. This is an example host protocol, not part of the SDK API.
 

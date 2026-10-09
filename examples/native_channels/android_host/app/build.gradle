@@ -39,5 +39,9 @@ dependencies {
     // Only this artifact changes by build mode, never by channel flavor.
     debugImplementation("com.jolibox.examples.jolibox_native_channels:flutter_debug:1.0")
     releaseImplementation("com.jolibox.examples.jolibox_native_channels:flutter_release:1.0")
-    admobImplementation project(":adBridge")
+    if (providers.gradleProperty("adBridgeMavenRepository").isPresent()) {
+        admobImplementation("com.jolibox.admediation:jolibox-ads-flutter-bridge-admob:0.8.0")
+    } else {
+        admobImplementation project(":adBridge")
+    }
 }

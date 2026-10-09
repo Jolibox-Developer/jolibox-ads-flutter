@@ -4,7 +4,7 @@
 
 `jolibox_ads_flutter` 是两个原生构建共用的唯一 Dart API 包，不包含原生插件或广告 SDK 依赖。宿主在原生侧决定是否添加 Android library 或 iOS Pod `JoliboxFlutterAdsBridgeAdMob`；有广告构建由该桥接引入 Jolibox Ad Mediation 和 Google Mobile Ads。两种构建共用同一份 Flutter module、pubspec、lockfile 和 Dart API。
 
-当前原生桥接以仓库源码交付；`0.8.0` 的 Git tag、Maven 坐标和 Pod 版本尚未发布。宿主不要配置尚不存在的发布版本。
+`0.8.0` 通过 Git tag 提供 Dart 包和 iOS Pod，通过同一 tag 下的 Maven 目录提供 Android 桥接制品，见 [GitHub Release](https://github.com/Jolibox-Developer/jolibox-ads-flutter/releases/tag/0.8.0)。iOS 使用明确的 Git Pod 依赖，不通过 CocoaPods trunk 分发。
 
 ## 环境基线
 
@@ -15,12 +15,14 @@
 
 ## 统一 Flutter 依赖
 
-Flutter module 只依赖基础 Dart 包。两个 native 构建必须消费同一份已解析的 module。本地开发配置见[共享 module](examples/native_channels/flutter_module/pubspec.yaml)，发布 ref 实际存在后再切换到 Git 依赖。
+Flutter module 只依赖基础 Dart 包。两个 native 构建必须消费同一份已解析的 module。正式接入固定发布 tag；[共享 module](examples/native_channels/flutter_module/pubspec.yaml)保留本地 path 以便开发。
 
 ```yaml
 dependencies:
   jolibox_ads_flutter:
-    path: /path/to/jolibox-ads-flutter
+    git:
+      url: https://github.com/Jolibox-Developer/jolibox-ads-flutter.git
+      ref: 0.8.0
 ```
 
 Flutter module 不再依赖旧 `jolibox_ads_flutter_admob` 插件。此前导出的 Flutter AAR/framework 如含旧插件，需要重新构建。
@@ -37,7 +39,20 @@ dependencies {
 
 只有广告 flavor 编译桥接 import 和注册包装。对每个广告 Engine 注册一次 `JoliboxAdsFlutterPlugin()`，必须早于 Dart 首次调用 `isAvailable()`；宿主其他 Flutter 插件照常注册。AdMob App ID、SDK 初始化代码只放广告 flavor。基础 flavor 不能通过共享模块继承广告依赖或初始化配置。
 
-本地可按 Android library 源码接入。桥接 Gradle 文件已配置仅用于本地的 Maven 制品生成；远端 Maven 坐标和制品尚未发布。单独一个 AAR 不携带 mediation 的传递依赖信息，Maven 消费还需要 POM。
+使用正式制品时，在宿主 settings 的依赖仓库中添加下列仓库，并保留 `google()`、`mavenCentral()` 和已有 Flutter 仓库：
+
+```gradle
+maven { url = uri("https://raw.githubusercontent.com/Jolibox-Developer/jolibox-ads-flutter/0.8.0/maven/") }
+maven { url = uri("https://raw.githubusercontent.com/Jolibox-Developer/jolibox-ad-mediation-android-maven/0.6.2/") }
+```
+
+将广告 flavor 的 project 依赖替换为：
+
+```gradle
+admobImplementation("com.jolibox.admediation:jolibox-ads-flutter-bridge-admob:0.8.0")
+```
+
+Maven 发布包含 AAR、POM 和 Gradle module 元数据，mediation/AdMob 自动传递引入，Flutter embedding 由宿主提供。源码接入则继续使用 `native/android` project 依赖。
 
 ## iOS 宿主接入
 
@@ -46,11 +61,15 @@ dependencies {
 ```ruby
 target 'HostAds' do
   install_all_flutter_pods(flutter_application_path)
-  pod 'JoliboxFlutterAdsBridgeAdMob', :path => '/path/to/jolibox-ads-flutter/native/ios'
+  pod 'JoliboxFlutterAdsBridgeAdMob',
+      :git => 'https://github.com/Jolibox-Developer/jolibox-ads-flutter.git',
+      :tag => '0.8.0'
 end
 ```
 
 `HostBase` 安装同一 Flutter module，但不加广告 Pod。不要把广告 Pod 放在两个 target 的共同父 target 中；广告 target 也不要再用 SPM 或手工 framework 链接第二份 Google/Jolibox。桥接引用宿主已有 Flutter Engine，不自带另一份引擎。
+
+本地开发可用 `:path => '/path/to/jolibox-ads-flutter'` 替代 `:git`/`:tag`。Podspec 位于仓库根目录；源码和内置 framework 仍位于 `native/ios`。
 
 Flutter 3.22.3 的 iOS Engine 必须先调用 `engine.run()`，再注册 MethodChannel。之后注册原有插件，并对每个广告 Engine 调用一次 `JoliboxAdsFlutterPlugin.register(with: engine)`。Dart 首次探测能力前要等注册完成；[宿主示例](examples/native_channels/ios_host/HostAds/AppDelegate.swift)在两个 target 都实现 `waitForHostReady`，这个握手属于示例宿主，不是 SDK 公共 API。
 

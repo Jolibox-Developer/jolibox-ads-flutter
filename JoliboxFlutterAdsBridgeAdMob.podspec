@@ -6,10 +6,9 @@ Pod::Spec.new do |s|
   s.homepage = 'https://github.com/Jolibox-Developer/jolibox-ads-flutter'
   s.license = { :type => 'Proprietary', :file => 'LICENSE' }
   s.author = 'Jolibox'
-  # This local source spec is consumed by :path; publication awaits an authorized Git ref.
-  s.source = { :path => '.' }
-  s.source_files = 'Classes/**/*.swift'
-  s.vendored_frameworks = 'Frameworks/JoliboxAdMediation.xcframework'
+  s.source = { :git => 'https://github.com/Jolibox-Developer/jolibox-ads-flutter.git', :tag => s.version.to_s }
+  s.source_files = 'native/ios/Classes/**/*.swift'
+  s.vendored_frameworks = 'native/ios/Frameworks/JoliboxAdMediation.xcframework'
   s.static_framework = true
   s.platform = :ios, '13.0'
   s.swift_version = '5.0'

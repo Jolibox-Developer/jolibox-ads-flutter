@@ -10,8 +10,12 @@ Build the shared module once with
 `ruby ../../../scripts/build-shared-module-aar.rb` from `../flutter_module`.
 Then from this directory run `./gradlew assembleBaseRelease assembleAdmobRelease`.
 The example uses a project dependency for development. The standalone bridge
-defines a local-only Maven publication with API dependency on mediation; an
-actual artifact publication/consumer check must be approved separately.
+generates the `0.8.0` Maven publication with API dependency on mediation.
+
+To verify the released Maven artifact instead of the source project, pass
+`-PadBridgeMavenRepository=https://raw.githubusercontent.com/Jolibox-Developer/jolibox-ads-flutter/0.8.0/maven/`
+to Gradle. The same option accepts a local Maven repository path for release
+verification. Only `admob` resolves the published adapter; `base` excludes it.
 
 Inspect flavor dependencies using `./gradlew :app:dependencies
 --configuration baseReleaseRuntimeClasspath` (and `admobReleaseRuntimeClasspath`).

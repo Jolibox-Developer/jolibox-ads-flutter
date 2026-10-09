@@ -5,8 +5,7 @@ plugins {
 }
 
 group = "com.jolibox.admediation"
-// Local verification coordinate only; no remote publication is configured.
-version = "0.8.0-local"
+version = "0.8.0"
 
 android {
     namespace = "com.jolibox.admediation.jolibox_ads_flutter"

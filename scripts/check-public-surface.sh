@@ -18,10 +18,13 @@ PUBLIC_PATHS=(
   "$ROOT_DIR/README_CN.md"
   "$ROOT_DIR/pubspec.yaml"
   "$ROOT_DIR/native/android/build.gradle"
-  "$ROOT_DIR/native/ios/JoliboxFlutterAdsBridgeAdMob.podspec"
+  "$ROOT_DIR/JoliboxFlutterAdsBridgeAdMob.podspec"
   "$ROOT_DIR/examples/native_channels/flutter_module/pubspec.yaml"
   "$ROOT_DIR/examples/native_channels/android_host/app/build.gradle"
   "$ROOT_DIR/examples/native_channels/ios_host/Podfile"
+  "$ROOT_DIR/maven/README.md"
+  "$ROOT_DIR/maven/com/jolibox/admediation/jolibox-ads-flutter-bridge-admob/0.8.0/jolibox-ads-flutter-bridge-admob-0.8.0.pom"
+  "$ROOT_DIR/maven/com/jolibox/admediation/jolibox-ads-flutter-bridge-admob/0.8.0/jolibox-ads-flutter-bridge-admob-0.8.0.module"
 )
 XCFRAMEWORK_DIR="$ROOT_DIR/native/ios/Frameworks/JoliboxAdMediation.xcframework"
 
@@ -64,7 +67,7 @@ fi
   exit 1
 }
 /usr/bin/grep -F -q "s.dependency 'Google-Mobile-Ads-SDK', '12.1.0'" \
-  "$ROOT_DIR/native/ios/JoliboxFlutterAdsBridgeAdMob.podspec" || {
+  "$ROOT_DIR/JoliboxFlutterAdsBridgeAdMob.podspec" || {
   echo "iOS adapter is missing its Google Ads dependency." >&2
   exit 1
 }

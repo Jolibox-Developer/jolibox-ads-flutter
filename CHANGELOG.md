@@ -2,12 +2,14 @@
 
 > 中文说明：[CHANGELOG_CN.md](CHANGELOG_CN.md)
 
-## 0.8.0 (unreleased)
+## 0.8.0
 
 - Keeps one shared Flutter Dart API package while moving Android and iOS ad bridges to optional native host dependencies.
 - Preserves the existing ad API; without a registered native bridge, initialization and loads complete silently and Banners occupy no space.
 - Requires ads-enabled native hosts to register the bridge on each Flutter Engine before the first capability probe. Existing automatic plugin registration no longer installs this bridge.
-- Adds shared-module Android flavor and iOS target examples, lifecycle tests, and integration guidance. No Maven, Pod, or Git tag has been published for this version.
+- Adds shared-module Android flavor and iOS target examples, lifecycle tests, and integration guidance.
+- Delivers the Dart package and iOS Pod through Git tag `0.8.0`, and the Android adapter `com.jolibox.admediation:jolibox-ads-flutter-bridge-admob:0.8.0` through the tag's Maven directory with transitive dependency metadata.
+- Moves the native iOS Podspec to the repository root for Git-based installation. Local Pod consumers must point `:path` at the repository root.
 
 ## 0.7.3
 

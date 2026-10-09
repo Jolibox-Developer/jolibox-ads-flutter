@@ -11,7 +11,9 @@ Flutter iOS does not permit setting method handlers until `engine.run()`, so
 both hosts run the engine, finish registrar setup, and then acknowledge the
 shared module's `jolibox_native_channels/host.waitForHostReady` handshake. Dart
 must await that acknowledgement before its first ad capability probe. This is
-a local demonstration, not a published Pod.
+a local demonstration. The example uses the repository root as a development
+Pod path; production hosts can install the same Pod from Git tag `0.8.0`, as
+shown in the root integration guide.
 The test AdMob App ID only satisfies SDK host configuration; real Jolibox ad
 loads require authorized `joliSource` and `scene` values. The native host must
 also implement its production consent/privacy policy.

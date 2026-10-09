@@ -12,7 +12,7 @@ PODS:
 DEPENDENCIES:
   - Flutter (from `../flutter_module/.ios/Flutter`)
   - FlutterPluginRegistrant (from `../flutter_module/.ios/Flutter/FlutterPluginRegistrant`)
-  - JoliboxFlutterAdsBridgeAdMob (from `../../../native/ios`)
+  - JoliboxFlutterAdsBridgeAdMob (from `../../..`)
 
 SPEC REPOS:
   trunk:
@@ -25,15 +25,15 @@ EXTERNAL SOURCES:
   FlutterPluginRegistrant:
     :path: "../flutter_module/.ios/Flutter/FlutterPluginRegistrant"
   JoliboxFlutterAdsBridgeAdMob:
-    :path: "../../../native/ios"
+    :path: "../../.."
 
 SPEC CHECKSUMS:
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   FlutterPluginRegistrant: 31c463909264601dccf8080d30b71b19413ad188
   Google-Mobile-Ads-SDK: c9e5722cac79b39241d13b911f9f1eb21bdd0802
   GoogleUserMessagingPlatform: befe603da6501006420c206222acd449bba45a9c
-  JoliboxFlutterAdsBridgeAdMob: e3c859ce873215a45a5a8eddd43a86380d72b03e
+  JoliboxFlutterAdsBridgeAdMob: 232982f90fa1f2784c018f66b68b9490a4796baa
 
-PODFILE CHECKSUM: 69d1b55c8a42f9c267442a67b19453b24f8e79aa
+PODFILE CHECKSUM: 1517856e53d611aff0a3de6bc67903d5de65a110
 
 COCOAPODS: 1.17.0
