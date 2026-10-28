@@ -34,6 +34,16 @@ internal class JoliboxBannerPlatformView(
 
     override fun getView(): View = container
 
+    // Implement Flutter's optional PlatformView callbacks in this class. Android hosts may
+    // desugar the embedding's Java interface defaults independently of this published AAR.
+    override fun onFlutterViewAttached(flutterView: View) = Unit
+
+    override fun onFlutterViewDetached() = Unit
+
+    override fun onInputConnectionLocked() = Unit
+
+    override fun onInputConnectionUnlocked() = Unit
+
     override fun dispose() {
         if (disposed) return
         disposed = true

@@ -5,6 +5,7 @@
 ## 0.8.1
 
 - Updates the Android bridge to depend on Jolibox Ad Mediation `0.8.1`, which moves the Google Mobile Ads initialization entry point to a worker and adds timing/thread diagnostics while preserving main-thread initialization completion and ad callbacks.
+- Explicitly implements Flutter `PlatformView` attachment and input-connection lifecycle callbacks in the Android Banner bridge to avoid `AbstractMethodError` in hosts that desugar embedding interface defaults separately from the published AAR.
 - Aligns Dart package, Android bridge, and iOS Pod metadata at `0.8.1`; keeps the Dart API, channel protocol, and explicit native registration unchanged.
 - Keeps the bundled iOS mediation `0.6.6` XCFramework, Google Mobile Ads iOS `12.1.0`, Google Mobile Ads Android `24.0.0`, and Flutter `3.22.3`.
 - Android hosts must update both tagged Maven repository URLs and the bridge coordinate; updating the Dart Git ref alone does not update the host's Gradle dependencies.

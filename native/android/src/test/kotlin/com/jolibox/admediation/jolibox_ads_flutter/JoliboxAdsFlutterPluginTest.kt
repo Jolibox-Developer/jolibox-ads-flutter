@@ -1,6 +1,7 @@
 package com.jolibox.admediation.jolibox_ads_flutter
 
 import android.content.Context
+import android.view.View
 import com.jolibox.admediation.api.JoliboxInterstitialAd
 import com.jolibox.admediation.api.JoliboxAdError
 import com.jolibox.admediation.api.JoliboxAdErrorCode
@@ -16,6 +17,19 @@ import kotlin.test.assertNull
 import org.mockito.Mockito
 
 internal class JoliboxAdsFlutterPluginTest {
+    @Test
+    fun bannerDeclaresFlutterPlatformViewCallbacksForHostAbi() {
+        val bannerClass = JoliboxBannerPlatformView::class.java
+        val callbacks = listOf(
+            bannerClass.getDeclaredMethod("onFlutterViewAttached", View::class.java),
+            bannerClass.getDeclaredMethod("onFlutterViewDetached"),
+            bannerClass.getDeclaredMethod("onInputConnectionLocked"),
+            bannerClass.getDeclaredMethod("onInputConnectionUnlocked"),
+        )
+
+        callbacks.forEach { assertEquals(Void.TYPE, it.returnType) }
+    }
+
     @Test
     fun unknownMethodReturnsNotImplemented() {
         val result = mockResult()
