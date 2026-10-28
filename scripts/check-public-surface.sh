@@ -23,8 +23,8 @@ PUBLIC_PATHS=(
   "$ROOT_DIR/examples/native_channels/android_host/app/build.gradle"
   "$ROOT_DIR/examples/native_channels/ios_host/Podfile"
   "$ROOT_DIR/maven/README.md"
-  "$ROOT_DIR/maven/com/jolibox/admediation/jolibox-ads-flutter-bridge-admob/0.8.0/jolibox-ads-flutter-bridge-admob-0.8.0.pom"
-  "$ROOT_DIR/maven/com/jolibox/admediation/jolibox-ads-flutter-bridge-admob/0.8.0/jolibox-ads-flutter-bridge-admob-0.8.0.module"
+  "$ROOT_DIR/maven/com/jolibox/admediation/jolibox-ads-flutter-bridge-admob/0.8.1/jolibox-ads-flutter-bridge-admob-0.8.1.pom"
+  "$ROOT_DIR/maven/com/jolibox/admediation/jolibox-ads-flutter-bridge-admob/0.8.1/jolibox-ads-flutter-bridge-admob-0.8.1.module"
 )
 XCFRAMEWORK_DIR="$ROOT_DIR/native/ios/Frameworks/JoliboxAdMediation.xcframework"
 
@@ -62,7 +62,7 @@ fi
   exit 1
 }
 
-/usr/bin/grep -F -q 'jolibox-ad-mediation:0.6.2' "$ROOT_DIR/native/android/build.gradle" || {
+/usr/bin/grep -F -q 'jolibox-ad-mediation:0.8.1' "$ROOT_DIR/native/android/build.gradle" || {
   echo "Android adapter is missing its mediation dependency." >&2
   exit 1
 }

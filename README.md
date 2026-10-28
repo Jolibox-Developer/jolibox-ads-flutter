@@ -4,12 +4,12 @@
 
 `jolibox_ads_flutter` is one Dart API package for both native host configurations. It has no native plugin or advertising SDK dependency. The native host chooses whether to link the Android library or iOS Pod `JoliboxFlutterAdsBridgeAdMob`. That adapter brings Jolibox Ad Mediation and Google Mobile Ads into the ads-enabled native build. Both configurations use the same Flutter module, pubspec, lockfile, and Dart API.
 
-Release `0.8.0` provides the Dart package and iOS Pod through the Git tag, and the Android adapter through the Maven directory in that same tag. See the [GitHub release](https://github.com/Jolibox-Developer/jolibox-ads-flutter/releases/tag/0.8.0). The iOS Pod uses an explicit Git dependency; it is not distributed through CocoaPods trunk.
+Release `0.8.1` provides the Dart package and iOS Pod through the Git tag, and the Android adapter through the Maven directory in that same tag. See the [GitHub release](https://github.com/Jolibox-Developer/jolibox-ads-flutter/releases/tag/0.8.1). The iOS Pod uses an explicit Git dependency; it is not distributed through CocoaPods trunk.
 
 ## Supported baseline
 
 - Flutter 3.22.3 / Dart 3.4.4, Android and iOS.
-- Android: minSdk 23, Java 17, Kotlin 2.0.21. The adapter declares `com.jolibox.android:jolibox-ad-mediation:0.6.2`, which brings Google Mobile Ads 24.0.0.
+- Android: minSdk 23, Java 17, Kotlin 2.0.21. The adapter declares `com.jolibox.android:jolibox-ad-mediation:0.8.1`, which brings Google Mobile Ads 24.0.0.
 - iOS: deployment target 13.0. The adapter includes Jolibox Ad Mediation 0.6.6 XCFramework and depends on `Google-Mobile-Ads-SDK` 12.1.0.
 - Local validation used Android Gradle Plugin 8.6.1 / Gradle 8.7 and Xcode 26.4 / CocoaPods 1.17.0. Other host toolchain combinations need their own build verification.
 
@@ -22,7 +22,7 @@ dependencies:
   jolibox_ads_flutter:
     git:
       url: https://github.com/Jolibox-Developer/jolibox-ads-flutter.git
-      ref: 0.8.0
+      ref: 0.8.1
 ```
 
 The Flutter module must not depend on the old `jolibox_ads_flutter_admob` plugin. Rebuild any previously exported Flutter AAR/framework that still contains it.
@@ -42,17 +42,19 @@ Only the ads flavor compiles its adapter import and registration wrapper. Regist
 For a released binary, add these repositories to the host's settings-level dependency repositories, alongside `google()`, `mavenCentral()` and the existing Flutter repositories:
 
 ```gradle
-maven { url = uri("https://raw.githubusercontent.com/Jolibox-Developer/jolibox-ads-flutter/0.8.0/maven/") }
-maven { url = uri("https://raw.githubusercontent.com/Jolibox-Developer/jolibox-ad-mediation-android-maven/0.6.2/") }
+maven { url = uri("https://raw.githubusercontent.com/Jolibox-Developer/jolibox-ads-flutter/0.8.1/maven/") }
+maven { url = uri("https://raw.githubusercontent.com/Jolibox-Developer/jolibox-ad-mediation-android-maven/0.8.1/") }
 ```
 
 Replace the ads flavor's project dependency with:
 
 ```gradle
-admobImplementation("com.jolibox.admediation:jolibox-ads-flutter-bridge-admob:0.8.0")
+admobImplementation("com.jolibox.admediation:jolibox-ads-flutter-bridge-admob:0.8.1")
 ```
 
 The Maven publication includes the AAR, POM and Gradle module metadata, so mediation and AdMob resolve transitively. Flutter embedding is supplied by the host. For source integration, keep the `native/android` project dependency instead.
+
+When upgrading to `0.8.1`, update both Maven repository URLs and the bridge coordinate above, as well as the Dart Git ref. Updating only the Dart dependency does not update the native host's Gradle dependencies. Native mediation `0.8.1` moves the Google Mobile Ads initialization entry point to a worker and adds timing/thread diagnostics; initialization completion and ad callbacks retain main-thread dispatch. Wait for initialization to complete before loading ads.
 
 ## iOS native host
 
@@ -63,9 +65,11 @@ target 'HostAds' do
   install_all_flutter_pods(flutter_application_path)
   pod 'JoliboxFlutterAdsBridgeAdMob',
       :git => 'https://github.com/Jolibox-Developer/jolibox-ads-flutter.git',
-      :tag => '0.8.0'
+      :tag => '0.8.1'
 end
 ```
+
+Existing iOS hosts may keep Pod tag `0.8.0` for this Android fix. Adopting Pod tag `0.8.1` aligns release metadata while retaining the same iOS native `0.6.6` binary and Google Mobile Ads `12.1.0`.
 
 `HostBase` installs the same Flutter module without the ad Pod. Keep the Pod out of any common parent target. Do not also link Google Mobile Ads or Jolibox through SPM or a manually embedded framework in the ads target. The native adapter uses the host's Flutter engine; it does not bundle another Flutter engine.
 

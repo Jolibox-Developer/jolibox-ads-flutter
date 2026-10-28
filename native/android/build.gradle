@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.jolibox.admediation"
-version = "0.8.0"
+version = "0.8.1"
 
 android {
     namespace = "com.jolibox.admediation.jolibox_ads_flutter"
@@ -32,7 +32,7 @@ def flutterEngineVersion = providers.gradleProperty("flutterEngineVersion")
 dependencies {
     // The host provides its Flutter 3.22.3 Engine at runtime; embedding is not published.
     compileOnly("io.flutter:flutter_embedding_debug:${flutterEngineVersion.get()}")
-    api("com.jolibox.android:jolibox-ad-mediation:0.6.2")
+    api("com.jolibox.android:jolibox-ad-mediation:0.8.1")
 
     testImplementation("io.flutter:flutter_embedding_debug:${flutterEngineVersion.get()}")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")

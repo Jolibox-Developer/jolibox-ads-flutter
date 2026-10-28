@@ -1,12 +1,12 @@
 # Android bridge Maven repository
 
-The `0.8.0` Git tag provides the Maven repository at:
+The `0.8.1` Git tag provides the Maven repository at:
 
-`https://raw.githubusercontent.com/Jolibox-Developer/jolibox-ads-flutter/0.8.0/maven/`
+`https://raw.githubusercontent.com/Jolibox-Developer/jolibox-ads-flutter/0.8.1/maven/`
 
-Coordinate: `com.jolibox.admediation:jolibox-ads-flutter-bridge-admob:0.8.0`.
+Coordinate: `com.jolibox.admediation:jolibox-ads-flutter-bridge-admob:0.8.1`.
 The AAR contains only the bridge. Its POM and Gradle module metadata declare
-Jolibox mediation `0.6.2`; the host also needs that SDK's Maven repository and
+Jolibox mediation `0.8.1`; the host also needs that SDK's Maven repository and
 Google/Maven Central repositories. The host supplies its existing Flutter
 Engine. Add the bridge only to the ads-enabled native configuration.
 

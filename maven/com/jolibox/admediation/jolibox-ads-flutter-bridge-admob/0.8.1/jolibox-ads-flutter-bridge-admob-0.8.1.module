@@ -1,0 +1,110 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.jolibox.admediation",
+    "module": "jolibox-ads-flutter-bridge-admob",
+    "version": "0.8.1",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.7"
+    }
+  },
+  "variants": [
+    {
+      "name": "releaseVariantReleaseApiPublication",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.libraryelements": "aar",
+        "org.gradle.usage": "java-api"
+      },
+      "dependencies": [
+        {
+          "group": "com.jolibox.android",
+          "module": "jolibox-ad-mediation",
+          "version": {
+            "requires": "0.8.1"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "2.0.21"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "jolibox-ads-flutter-bridge-admob-0.8.1.aar",
+          "url": "jolibox-ads-flutter-bridge-admob-0.8.1.aar",
+          "size": 35686,
+          "sha512": "45c91754ddaf51ad85e1517aea2182974068facf2e65dfed808ffefcfecef2a2a0c382fa1a821b900eea78ffa5a9d8ae00ee580789f6ff57bcfbc902eda5c12a",
+          "sha256": "31a3791e06fe6f23eddb0a17afe35f8170e593563159bda49f7e73f122f145fc",
+          "sha1": "61096584df15dfc4d6b5c7b0a0d2a4aae1ac2e8a",
+          "md5": "36cb1a6fe86ee6d87eeb61e77be3ee7e"
+        }
+      ]
+    },
+    {
+      "name": "releaseVariantReleaseRuntimePublication",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.libraryelements": "aar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "com.jolibox.android",
+          "module": "jolibox-ad-mediation",
+          "version": {
+            "requires": "0.8.1"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "2.0.21"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "jolibox-ads-flutter-bridge-admob-0.8.1.aar",
+          "url": "jolibox-ads-flutter-bridge-admob-0.8.1.aar",
+          "size": 35686,
+          "sha512": "45c91754ddaf51ad85e1517aea2182974068facf2e65dfed808ffefcfecef2a2a0c382fa1a821b900eea78ffa5a9d8ae00ee580789f6ff57bcfbc902eda5c12a",
+          "sha256": "31a3791e06fe6f23eddb0a17afe35f8170e593563159bda49f7e73f122f145fc",
+          "sha1": "61096584df15dfc4d6b5c7b0a0d2a4aae1ac2e8a",
+          "md5": "36cb1a6fe86ee6d87eeb61e77be3ee7e"
+        }
+      ]
+    },
+    {
+      "name": "releaseVariantReleaseSourcePublication",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "jolibox-ads-flutter-bridge-admob-0.8.1-sources.jar",
+          "url": "jolibox-ads-flutter-bridge-admob-0.8.1-sources.jar",
+          "size": 5844,
+          "sha512": "fdd92f01fd88cbf84b509a08c8d0c706ddc1e40bbdd88cc9f6c65476277073913a6035745b54e833dbc87779f72722885c60d7ddfbe8c0dae55060dc5455f59b",
+          "sha256": "6d23ea9a20fc1a03d61469f6776c492fc13fb0a3dcecf90d02eebd1b1ef05da2",
+          "sha1": "045e6e6b3bad3e8ef31e5d51025948acaf1fd08e",
+          "md5": "84737a7f7aaed8acd6949d05c7292c75"
+        }
+      ]
+    }
+  ]
+}

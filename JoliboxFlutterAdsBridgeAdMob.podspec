@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = 'JoliboxFlutterAdsBridgeAdMob'
-  s.version = '0.8.0'
+  s.version = '0.8.1'
   s.summary = 'Native iOS bridge for the Jolibox Flutter ads channels.'
   s.description = 'An explicitly registered iOS adapter for a host-owned FlutterEngine.'
   s.homepage = 'https://github.com/Jolibox-Developer/jolibox-ads-flutter'

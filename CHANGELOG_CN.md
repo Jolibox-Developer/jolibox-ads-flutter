@@ -2,6 +2,13 @@
 
 > English documentation: [CHANGELOG.md](CHANGELOG.md)
 
+## 0.8.1
+
+- Android 桥接依赖升级为 Jolibox Ad Mediation `0.8.1`：将 Google Mobile Ads 初始化入口调度至后台 worker，增加耗时与线程诊断，同时保持初始化完成及广告回调在主线程调度。
+- Dart 包、Android 桥接与 iOS Pod 元数据统一为 `0.8.1`；Dart API、通道协议及显式原生注册方式保持不变。
+- 保持内置 iOS mediation `0.6.6` XCFramework、iOS Google Mobile Ads `12.1.0`、Android Google Mobile Ads `24.0.0` 和 Flutter `3.22.3`。
+- Android 宿主须同时更新两个带 tag 的 Maven 仓库地址及桥接坐标；仅更新 Dart Git ref 不会更新宿主 Gradle 依赖。
+
 ## 0.8.0
 
 - 保留统一的 Flutter Dart API 包，将 Android 和 iOS 广告桥接移为宿主原生侧的可选依赖。

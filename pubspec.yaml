@@ -1,6 +1,6 @@
 name: jolibox_ads_flutter
 description: Optional Dart API for Jolibox ads.
-version: 0.8.0
+version: 0.8.1
 homepage: https://github.com/Jolibox-Developer/jolibox-ads-flutter
 
 environment:
